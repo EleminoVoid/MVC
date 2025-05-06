@@ -22,7 +22,7 @@
     document.getElementById('loginForm').addEventListener('submit', function(event) {
         event.preventDefault(); // Prevent default form submission
 
-        const email = document.querySelector('input[name="username"]').value;
+        const username = document.querySelector('input[name="username"]').value; // Get username
         const password = document.querySelector('input[name="password"]').value;
 
         fetch('/login', {
@@ -30,19 +30,19 @@
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ email, password }) // Send JSON data
+            body: JSON.stringify({ username, password }) // Send JSON data
         })
         .then(response => response.json())
         .then(data => {
             const messageDiv = document.getElementById('message');
+            // Always display the JSON response
+            messageDiv.innerText = JSON.stringify(data); // Display the entire JSON response
+
             if (data.status === 200) {
-                // Display success message or redirect
                 messageDiv.style.color = 'green';
-                messageDiv.innerText = 'Login successful! Token: ' + data.token; // Display token or redirect
+                // Optionally, you can redirect or perform other actions here
             } else {
-                // Display error message
-                messageDiv.style.color = 'red';
-                messageDiv.innerText = data.error; // Show error message
+                messageDiv.style.color = 'red'; // Keep the error message in red
             }
         })
         .catch(error => {
