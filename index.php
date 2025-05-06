@@ -1,7 +1,8 @@
 <?php
+// File: /mvc/index.php
 namespace mvc;
 
-require_once 'init.php'; 
+require_once 'init.php'; // Include the initialization file
 
 use mvc\models\Database;
 use mvc\models\UserRepository;
@@ -15,7 +16,7 @@ use mvc\middlewares\AuthMiddleware;
 use mvc\middlewares\RouteMatcher;
 
 // Database connection
-$db = new Database('localhost', 'root', 'root', 'UDB');
+$db = new Database('localhost', 'root', 'root', 'user');
 
 // Repositories
 $userRepository = new UserRepository($db); 

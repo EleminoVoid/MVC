@@ -1,4 +1,5 @@
 <?php
+// File: /mvc/controllers/AuthenticationController.php
 namespace mvc\controllers;
 
 use Firebase\JWT\JWT;

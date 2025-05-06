@@ -1,4 +1,5 @@
 <?php
+// File: /mvc/middlewares/AuthMiddleware.php
 namespace mvc\middlewares;
 
 use mvc\controllers\AuthenticationController;

@@ -1,4 +1,5 @@
 <?php
+// File: /mvc/models/Database.php
 namespace mvc\models;
 
 use PDO;

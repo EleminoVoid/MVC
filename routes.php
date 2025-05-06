@@ -1,4 +1,5 @@
 <?php
+// File: /mvc/routes.php
 namespace mvc;
 
 global $request, $controller, $studentController, $userController, $authController, $authMiddleware;
@@ -8,12 +9,12 @@ return [
     [
         'method' => 'GET',
         'path' => '/users',
-        'handler' => function () use ($userController, $authMiddleware, $request) {
+        'handler' => function () use ($controller, $authMiddleware, $request) {
             echo "Users route matched\n";
             $authResponse = $authMiddleware->handle($request);
             if ($authResponse) return $authResponse;
 
-            return $userController->getAllUsers();
+            return $controller->getAllUsers();
         }
     ],
     [
@@ -92,6 +93,7 @@ return [
     ],
 
     // For JWT
+
     [
         'method' => 'POST',
         'path' => '/register',
@@ -101,11 +103,25 @@ return [
         }
     ],
     [
+        'method' => 'GET',
+        'path' => '/register',
+        'handler' => function () use ($authController) {
+            return $authController->showRegisterForm();
+        }
+    ],
+    [
         'method' => 'POST',
         'path' => '/login',
         'handler' => function () use ($authController) {
             echo "Login route matched\n";
             return $authController->login();
+        }
+    ],
+    [
+        'method' => 'GET',
+        'path' => '/login',
+        'handler' => function () use ($authController) {
+            return $authController->showLoginForm();
         }
     ],
 ];
