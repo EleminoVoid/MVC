@@ -124,4 +124,14 @@ return [
             return $authController->showLoginForm();
         }
     ],
+
+    //Blades
+    [
+        //??????
+        'method' => 'GET',
+        'path' => '/',
+        'handler' => function () {
+            return __DIR__ . '/views/home.php';
+        }
+    ],
 ];

@@ -37,6 +37,14 @@ global $userController;
 // Load routes
 $routes = include __DIR__ . '/routes.php';
 
+$routes[] = [
+    'method' => 'GET',
+    'path' => '/1',
+    'handler' => function () {
+        include __DIR__ . '/views/home.php'; // Load the home page view
+    }
+];
+
 // Initialize the router
 $router = new Router($request, new RouteMatcher());
 
