@@ -30,11 +30,14 @@ class Router {
             $this->request->getMethod(),
             $this->request->getPath()
         );
-
         if ($match) {
             return call_user_func_array($match['handler'], array_values($match['params']));
         }
-
-        return new Response(404, json_encode(['error' => 'Not Found']));
+        // Return 404 response
+        http_response_code(404);
+        include __DIR__ . '/../views/404.php'; // Include the 404 view
+        exit;
     }
+    
+    
 }

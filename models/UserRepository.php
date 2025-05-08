@@ -45,4 +45,6 @@ class UserRepository implements DataRepositoryInterface {
         $result = $this->db->query($query, [$email]);
         return $result ? $result[0] : null;
     }
+
+    
 }

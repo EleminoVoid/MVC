@@ -40,4 +40,6 @@ class StudentRepository implements DataRepositoryInterface {
     public function delete($id) {
         $this->db->query("DELETE FROM students WHERE studID = ?", [$id]);
     }
+
+    
 }

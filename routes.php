@@ -2,7 +2,7 @@
 // File: /mvc/routes.php
 namespace mvc;
 
-global $request, $controller, $studentController, $userController, $authController, $authMiddleware;
+global $request, $controller, $studentController, $userController, $authController, $authMiddleware, $viewController;
 
 return [
     // Users
@@ -102,36 +102,84 @@ return [
             return $authController->register();
         }
     ],
-    [
-        'method' => 'GET',
-        'path' => '/register',
-        'handler' => function () use ($authController) {
-            return $authController->showRegisterForm();
-        }
-    ],
+
     [
         'method' => 'POST',
         'path' => '/login',
         'handler' => function () use ($authController) {
-            echo "Login route matched\n";
-            return $authController->login();
+            $response = $authController->login();
+            header('Content-Type: application/json');
+            echo json_encode($response);
+        }
+    ],
+    
+
+    //Views
+    [
+        //??????
+        'method' => 'GET',
+        'path' => '/home',
+        'handler' => function () use ($viewController) {
+            $response = $viewController->renderView('home');
+            if (isset($response['html'])) {
+                echo $response['html'];
+            } else {
+                http_response_code($response['status']);
+                echo json_encode($response);
+            }
         }
     ],
     [
         'method' => 'GET',
         'path' => '/login',
-        'handler' => function () use ($authController) {
-            return $authController->showLoginForm();
+        'handler' => function () use ($viewController) {
+            $response = $viewController->renderView('login');
+            if (isset($response['html'])) {
+                echo $response['html'];
+            } else {
+                http_response_code($response['status']);
+                echo json_encode($response);
+            }
         }
     ],
-
-    //Blades
+    [
+        'method' => 'GET',
+        'path' => '/register',
+        'handler' => function () use ($viewController) {
+            $response = $viewController->renderView('register');
+            if (isset($response['html'])) {
+                echo $response['html'];
+            } else {
+                http_response_code($response['status']);
+                echo json_encode($response);
+            }
+        }
+    ],
+    [
+        'method' => 'GET',
+        'path' => '/services',
+        'handler' => function () use ($viewController) {
+            $response = $viewController->renderView('services');
+            if (isset($response['html'])) {
+                echo $response['html'];
+            } else {
+                http_response_code($response['status']);
+                echo json_encode($response);
+            }
+        }
+    ],
     [
         //??????
         'method' => 'GET',
-        'path' => '/',
-        'handler' => function () {
-            return __DIR__ . '/views/home.php';
+        'path' => '/about',
+        'handler' => function () use ($viewController) {
+            $response = $viewController->renderView('about');
+            if (isset($response['html'])) {
+                echo $response['html'];
+            } else {
+                http_response_code($response['status']);
+                echo json_encode($response);
+            }
         }
     ],
 ];

@@ -12,11 +12,12 @@ use mvc\requests\Router;
 use mvc\controllers\AuthenticationController;
 use mvc\controllers\UserController;
 use mvc\controllers\StudentController;
+use mvc\controllers\ViewController;
 use mvc\middlewares\AuthMiddleware;
 use mvc\middlewares\RouteMatcher;
 
 // Database connection
-$db = new Database('localhost', 'root', 'root', 'user');
+$db = new Database('localhost', 'root', 'root', 'UDB');
 
 // Repositories
 $userRepository = new UserRepository($db); 
@@ -28,8 +29,9 @@ $request = new Request();
 // Controllers
 $userController = new UserController($userRepository, $request); 
 $studentController = new StudentController($studentRepository, $request);
-$authController = new AuthenticationController($userRepository); 
+$authController = new AuthenticationController($userRepository, $request); 
 $authMiddleware = new AuthMiddleware($authController); 
+$viewController = new ViewController($userRepository, $request); 
 
 // Global variable for user controller
 global $userController;
@@ -37,13 +39,7 @@ global $userController;
 // Load routes
 $routes = include __DIR__ . '/routes.php';
 
-$routes[] = [
-    'method' => 'GET',
-    'path' => '/1',
-    'handler' => function () {
-        include __DIR__ . '/views/home.php'; // Load the home page view
-    }
-];
+
 
 // Initialize the router
 $router = new Router($request, new RouteMatcher());
@@ -56,15 +52,23 @@ foreach ($routes as $route) {
 // Dispatch the request
 $response = $router->dispatch();
 
+//program works bitches if has this V fucker
 // Handle array responses
 if (is_array($response)) {
     http_response_code($response['status'] ?? 200);
     header('Content-Type: application/json');
     echo json_encode($response);
     exit;
+}else{
+    return ;
 }
 
+if(http_response_code($response->getStatusCode())){
 // Send the response
 http_response_code($response->getStatusCode());
 header('Content-Type: application/json');
 echo $response->getBody();
+}else{
+    return ;
+
+}

@@ -7,10 +7,10 @@
 </head>
 <body>
     <h1>Login</h1>
-    <div id="message" style="color: red;"></div> <!-- Div to display messages -->
+    <div id="message" style="color: red;"></div> 
     <form id="loginForm">
-        <label for="username">Username:</label>
-        <input type="text" name="username" required>
+        <label for="email">Email:</label>
+        <input type="email" name="email" required>
         <br>
         <label for="password">Password:</label>
         <input type="password" name="password" required>
@@ -18,38 +18,47 @@
         <button type="submit">Login</button>
     </form>
 
+    <p><a href="register">Register here.</a></p>
+
     <script>
     document.getElementById('loginForm').addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent default form submission
+    event.preventDefault();
+    const email = document.querySelector('input[name="email"]').value;
+    const password = document.querySelector('input[name="password"]').value;
 
-        const username = document.querySelector('input[name="username"]').value; // Get username
-        const password = document.querySelector('input[name="password"]').value;
+    fetch('/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+    })
+    .then(response => response.json())
+    .then(data => {
+        const messageDiv = document.getElementById('message');
 
-        fetch('/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ username, password }) // Send JSON data
-        })
-        .then(response => response.json())
-        .then(data => {
-            const messageDiv = document.getElementById('message');
-            // Always display the JSON response
-            messageDiv.innerText = JSON.stringify(data); // Display the entire JSON response
+        if (data.status === 200) {
+            messageDiv.style.color = 'green';
+            messageDiv.innerText = 'Login successful! Redirecting...';
+            
+            // Optionally store token in localStorage or cookies
+            localStorage.setItem('token', data.token);
 
-            if (data.status === 200) {
-                messageDiv.style.color = 'green';
-                // Optionally, you can redirect or perform other actions here
-            } else {
-                messageDiv.style.color = 'red'; // Keep the error message in red
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            document.getElementById('message').innerText = 'An error occurred. Please try again.';
-        });
+            // Redirect to home.php
+            setTimeout(() => {
+                window.location.href = '/home';
+            }, 1000);
+        } else {
+            messageDiv.style.color = 'red';
+            messageDiv.innerText = data.error || 'Login failed';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('message').innerText = 'An error occurred. Please try again.';
     });
+});
+
     </script>
 </body>
 </html>
