@@ -37,38 +37,35 @@ $viewController = new ViewController($userRepository, $request);
 global $userController;
 
 // Load routes
-$routes = include __DIR__ . '/routes.php';
-
-
+$allRoutes = include __DIR__ . '/routes.php';
 
 // Initialize the router
 $router = new Router($request, new RouteMatcher());
 
-// Add routes to the router
-foreach ($routes as $route) {
-    $router->addRoute($route['method'], $route['path'], $route['handler']);
+// Loop through grouped routes and register each
+foreach ($allRoutes as $group) {
+    foreach ($group['routes'] as $route) {
+        $router->addRoute($route['method'], $route['path'], $route['handler']);
+    }
 }
 
 // Dispatch the request
 $response = $router->dispatch();
 
-//program works bitches if has this V fucker
-// Handle array responses
+// Handle array or Response object
 if (is_array($response)) {
     http_response_code($response['status'] ?? 200);
     header('Content-Type: application/json');
     echo json_encode($response);
     exit;
-}else{
-    return ;
-}
-
-if(http_response_code($response->getStatusCode())){
-// Send the response
-http_response_code($response->getStatusCode());
-header('Content-Type: application/json');
-echo $response->getBody();
-}else{
-    return ;
-
+} elseif ($response instanceof \mvc\responses\Response) {
+    http_response_code($response->getStatusCode());
+    header('Content-Type: application/json');
+    echo $response->getBody();
+    exit;
+} else {
+    // fallback
+    http_response_code(200);
+    echo $response;
+    exit;
 }

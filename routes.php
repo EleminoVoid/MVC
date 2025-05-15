@@ -3,6 +3,10 @@
 namespace mvc;
 
 global $request, $controller, $studentController, $userController, $authController, $authMiddleware, $viewController;
+define('U', 'user/');
+define('P', 'public/');
+define('A', 'admin/');
+
 
 return [
     // Users
@@ -120,7 +124,7 @@ return [
         'method' => 'GET',
         'path' => '/home',
         'handler' => function () use ($viewController) {
-            $response = $viewController->renderView('home');
+            $response = $viewController->renderView( U . "/home");
             if (isset($response['html'])) {
                 echo $response['html'];
             } else {
@@ -133,7 +137,7 @@ return [
         'method' => 'GET',
         'path' => '/login',
         'handler' => function () use ($viewController) {
-            $response = $viewController->renderView('login');
+            $response = $viewController->renderView(P . "login");
             if (isset($response['html'])) {
                 echo $response['html'];
             } else {
@@ -146,7 +150,7 @@ return [
         'method' => 'GET',
         'path' => '/register',
         'handler' => function () use ($viewController) {
-            $response = $viewController->renderView('register');
+            $response = $viewController->renderView(P . "register");
             if (isset($response['html'])) {
                 echo $response['html'];
             } else {
@@ -159,7 +163,7 @@ return [
         'method' => 'GET',
         'path' => '/services',
         'handler' => function () use ($viewController) {
-            $response = $viewController->renderView('services');
+            $response = $viewController->renderView(U . 'services');
             if (isset($response['html'])) {
                 echo $response['html'];
             } else {
@@ -173,7 +177,7 @@ return [
         'method' => 'GET',
         'path' => '/about',
         'handler' => function () use ($viewController) {
-            $response = $viewController->renderView('about');
+            $response = $viewController->renderView(U.'about');
             if (isset($response['html'])) {
                 echo $response['html'];
             } else {

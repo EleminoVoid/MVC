@@ -35,7 +35,7 @@ class Router {
         }
         // Return 404 response
         http_response_code(404);
-        include __DIR__ . '/../views/404.php'; // Include the 404 view
+        include __DIR__ . '/../views/public/404.php';
         exit;
     }
     

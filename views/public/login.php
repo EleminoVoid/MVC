@@ -4,21 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    <link rel="stylesheet" href="views\public\styles.css">
 </head>
 <body>
-    <h1>Login</h1>
-    <div id="message" style="color: red;"></div> 
-    <form id="loginForm">
-        <label for="email">Email:</label>
-        <input type="email" name="email" required>
-        <br>
-        <label for="password">Password:</label>
-        <input type="password" name="password" required>
-        <br>
-        <button type="submit">Login</button>
-    </form>
+    <div class="container">
+        <h1>Login</h1>
+        <div id="message"></div> 
+        <form id="loginForm">
+            <label for="email">Email:</label>
+            <input type="email" name="email" required>
+            
+            <label for="password">Password:</label>
+            <input type="password" name="password" required>
+            
+            <button type="submit">Login</button>
+        </form>
 
-    <p><a href="register">Register here.</a></p>
+        <p>Don't have an account? <a href="register">Register here.</a></p>
+    </div>
 
     <script>
     document.getElementById('loginForm').addEventListener('submit', function(event) {
@@ -58,7 +61,6 @@
         document.getElementById('message').innerText = 'An error occurred. Please try again.';
     });
 });
-
     </script>
 </body>
 </html>
