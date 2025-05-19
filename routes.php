@@ -26,7 +26,7 @@ return [
         ]
     ],
 
-    // User CRUD routes
+    // User routes (authentication required)
     'users' => [
         'middleware' => [$authMiddleware],
         'routes' => [
@@ -125,6 +125,21 @@ return [
                     return $studentController->deleteStudent($id);
                 }
             ]
+        ]
+    ],
+
+    // Admin routes (authentication + admin required)
+    'admin' => [
+        'middleware' => [$authMiddleware, $adminMiddleware],
+        'routes' => [
+            [
+                'method' => 'GET',
+                'path' => '/admin/dashboard',
+                'handler' => function () use ($adminController) {
+                    return $adminController->dashboard();
+                }
+            ],
+            // ...other admin-only routes...
         ]
     ]
 ];

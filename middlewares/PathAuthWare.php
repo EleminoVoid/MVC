@@ -69,7 +69,6 @@ class RouteDispatcher
     
     private function matchesRoute(string $routePattern, string $path): bool
     {
-        // Convert route pattern to regex
         $regex = preg_replace('/\{[^}]+\}/', '([^/]+)', $routePattern);
         $regex = str_replace('/', '\/', $regex);
         $regex = '/^' . $regex . '$/';
