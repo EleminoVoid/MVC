@@ -15,11 +15,12 @@ class Router {
         $this->routeMatcher = $routeMatcher;
     }
 
-    public function addRoute($method, $path, $handler) {
+    public function addRoute($method, $path, $handler, $middleware = []) {
         $this->routes[] = [
             'method' => strtoupper($method),
             'path' => $path,
-            'handler' => $handler
+            'handler' => $handler,
+            'middleware' => $middleware
         ];
     }
 
@@ -31,9 +32,24 @@ class Router {
         );
 
         if ($match) {
-            return call_user_func_array($match['handler'], array_values($match['params']));
+            // Fix: Ensure $match['middleware'] is always an array
+            $middlewares = isset($match['middleware']) && is_array($match['middleware']) ? $match['middleware'] : [];
+            foreach ($middlewares as $middleware) {
+                $result = $middleware->handle($this->request);
+                if ($result !== null) {
+                    return $result;
+                }
+            }
+            return $match['handler'](...array_values($match['params']));
         }
 
-        return new Response(404, json_encode(['error' => 'Not Found']));
+        ob_start();
+        include __DIR__ . '/../views/404.php';
+        $content = ob_get_clean();
+        return new Response(404, $content, ['Content-Type' => 'text/html']);
     }
+}
+$method = $route['method'] ?? '';
+if ($method !== '') {
+    $method = strtoupper($method);
 }

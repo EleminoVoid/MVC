@@ -2,41 +2,36 @@
 namespace mvc\models;
 
 use mvc\classes\DataRepositoryInterface;
-use mvc\models\Database;
+use mvc\models\DBORM;
 
 class StudentRepository implements DataRepositoryInterface {
     private $db;
 
-    public function __construct(Database $db) {
+    public function __construct(DBORM $db) {
         $this->db = $db;
     }
 
     public function getAll() {
-        return $this->db->query("SELECT * FROM students");
+        return $this->db->table('students')->select()->getAll();
     }
 
     public function getById($id) {
-        return $this->db->query("SELECT * FROM students WHERE studID = ?", [$id]);
+        return $this->db->table('students')->select()->where('id', $id)->first();
+    }
+
+    public function getByEmail($email) {
+        return $this->db->table('students')->select()->where('email', $email)->first();
     }
 
     public function create($data) {
-        $columns = implode(", ", array_keys($data));
-        $placeholders = implode(", ", array_fill(0, count($data), "?"));
-        $this->db->query(
-            "INSERT INTO students ($columns) VALUES ($placeholders)",
-            array_values($data)
-        );
+        return $this->db->table('students')->insert($data);
     }
 
     public function update($id, $data) {
-        $setClause = implode(", ", array_map(fn($key) => "$key = ?", array_keys($data)));
-        $this->db->query(
-            "UPDATE students SET $setClause WHERE studID = ?",
-            [...array_values($data), $id]
-        );
+        return $this->db->table('students')->where('id', $id)->update($data);
     }
 
     public function delete($id) {
-        $this->db->query("DELETE FROM students WHERE studID = ?", [$id]);
+        return $this->db->table('students')->where('id', $id)->delete();
     }
 }

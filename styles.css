@@ -1,0 +1,230 @@
+/* Import an elegant font */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
+
+/* General Reset and Body */
+body, h1, h2, h3, h4, h5, h6, p, ul, li, form, input, button, label {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Montserrat', Arial, sans-serif;
+    background: #e6f9ec; /* light green */
+    color: #222;
+    min-height: 100vh;
+}
+
+/* Header */
+header {
+    background: #218838; /* rich green */
+    color: #fff;
+    padding: 1.5rem 0;
+    text-align: center;
+    margin-bottom: 2rem;
+    letter-spacing: 1px;
+    box-shadow: 0 2px 8px rgba(33,136,56,0.08);
+}
+
+/* Main Container */
+main {
+    max-width: 700px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(33,136,56,0.07);
+}
+
+/* Headings */
+h1, h2 {
+    margin-bottom: 1.2rem;
+    font-weight: 700;
+    font-family: 'Montserrat', Arial, sans-serif;
+    letter-spacing: 0.5px;
+}
+
+h1 {
+    font-size: 2.2rem;
+}
+
+h2 {
+    font-size: 1.5rem;
+}
+
+/* Student List */
+ul.student-list {
+    list-style: none;
+    margin-bottom: 2rem;
+    padding: 0;
+}
+
+ul.student-list li {
+    background: #f0fff5;
+    margin-bottom: 0.7rem;
+    padding: 1rem 1.2rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 1px 3px rgba(33,136,56,0.05);
+}
+
+ul.student-list li .actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+a, .btn, .back-btn {
+    color: #fff;
+    background: #43a047;
+    border: none;
+    padding: 0.5rem 1.1rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+    display: inline-block;
+    font-family: 'Montserrat', Arial, sans-serif;
+    box-shadow: 0 2px 4px rgba(33,136,56,0.08);
+}
+
+a:hover, .btn:hover, .back-btn:hover {
+    background: #2e7031;
+    text-decoration: none;
+    box-shadow: 0 4px 8px rgba(33,136,56,0.12);
+}
+
+form.inline {
+    display: inline;
+    margin: 0;
+}
+
+button.delete-btn {
+    background: #dc3545 !important; /* red */
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-family: 'Montserrat', Arial, sans-serif;
+}
+
+button.delete-btn:hover {
+    background: #b52a37 !important;
+}
+
+/* Form Styles */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    margin-bottom: 1.5rem;
+}
+
+label {
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    font-family: 'Montserrat', Arial, sans-serif;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    padding: 0.6rem;
+    border: 1px solid #81c784;
+    border-radius: 4px;
+    font-size: 1rem;
+    width: 100%;
+    font-family: 'Montserrat', Arial, sans-serif;
+    background: #f7fff9;
+}
+
+button[type="submit"] {
+    background: #28a745;
+    color: #fff;
+    border: none;
+    padding: 0.7rem 1.3rem;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-family: 'Montserrat', Arial, sans-serif;
+}
+
+button[type="submit"]:hover {
+    background: #218838;
+}
+
+/* Back Link */
+a.back-btn {
+    background: #6c757d;
+    margin-top: 1rem;
+}
+
+a.back-btn:hover {
+    background: #495057;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    list-style: none;
+    justify-content: center;
+    margin-top: 20px;
+    gap: 5px;
+}
+
+.pagination li {
+    margin: 0 2px;
+}
+
+.pagination a {
+    display: inline-block;
+    padding: 5px 10px;
+    border: 1px solid #81c784;
+    border-radius: 3px;
+    text-decoration: none;
+    color: #222;
+    background: #e6f9ec;
+    font-family: 'Montserrat', Arial, sans-serif;
+}
+
+.pagination a.active {
+    background-color: #43a047;
+    color: white;
+    border-color: #43a047;
+}
+
+.pagination a:hover:not(.active) {
+    background-color: #b2dfdb;
+}
+
+/* Misc */
+.user-list, .user-count {
+    margin-bottom: 1rem;
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+}
+
+/* Responsive */
+@media (max-width: 800px) {
+    main {
+        padding: 1rem;
+    }
+    h1 {
+        font-size: 1.5rem;
+    }
+    ul.student-list li {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+}

@@ -25,16 +25,24 @@ class UserController {
         }
         return new Response(200, json_encode($user[0]));
     }
+    
+    public function getUserByEmail($email) {
+        $user = $this->userRepository->getByEmail($email);
+        if (empty($user)) {
+            return new Response(404, json_encode(['error' => 'User  not found']));
+        }
+        return new Response(200, json_encode($user[0]));
+    }
 
     public function createUser () {
         $data = $this->request->getBody();
         if (isset($data['password'])) {
             $data['password'] = password_hash($data['password'], PASSWORD_BCRYPT);
         } else {
-            return ['status' => 400, 'error' => 'Password is required'];
+            return new Response(400, json_encode(['error' => 'Password is required']), ['Content-Type' => 'application/json']);
         }
         $this->userRepository->create($data);
-        return new Response(201, json_encode(['message' => 'User  created']));
+        return new Response(201, json_encode(['message' => 'User  created']), ['Content-Type' => 'application/json']);
     }
 
     public function updateUser ($id) {
@@ -42,10 +50,10 @@ class UserController {
         if (isset($data['password'])) {
             $data['password'] = password_hash($data['password'], PASSWORD_BCRYPT);
         } else {
-            return ['status' => 400, 'error' => 'Password is required'];
+            return new Response(400, json_encode(['error' => 'Password is required']), ['Content-Type' => 'application/json']);
         }
         $this->userRepository->update($id, $data);
-        return new Response(200, json_encode(['message' => 'User  updated']));
+        return new Response(200, json_encode(['message' => 'User  updated']), ['Content-Type' => 'application/json']);
     }
 
     public function deleteUser ($id) {

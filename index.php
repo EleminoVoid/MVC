@@ -3,7 +3,7 @@ namespace mvc;
 
 require_once 'init.php'; 
 
-use mvc\models\Database;
+use mvc\models\Database;//defunct
 use mvc\models\UserRepository;
 use mvc\models\StudentRepository;
 use mvc\requests\Request;
@@ -11,15 +11,15 @@ use mvc\requests\Router;
 use mvc\controllers\AuthenticationController;
 use mvc\controllers\UserController;
 use mvc\controllers\StudentController;
+use mvc\controllers\ViewController;
 use mvc\middlewares\AuthMiddleware;
 use mvc\middlewares\RouteMatcher;
+use mvc\models\DBORM;
 
-// Database connection
-$db = new Database('localhost', 'root', 'root', 'UDB');
+$dborm = new DBORM('localhost', 'root', 'root', 'UDB');
 
-// Repositories
-$userRepository = new UserRepository($db); 
-$studentRepository = new StudentRepository($db);
+$userRepository = new UserRepository($dborm); 
+$studentRepository = new StudentRepository($dborm);
 
 // Request handling
 $request = new Request();
@@ -28,6 +28,7 @@ $request = new Request();
 $userController = new UserController($userRepository, $request); 
 $studentController = new StudentController($studentRepository, $request);
 $authController = new AuthenticationController($userRepository); 
+$viewController = new ViewController($studentRepository, $request);
 $authMiddleware = new AuthMiddleware($authController); 
 
 // Global variable for user controller
@@ -40,8 +41,15 @@ $routes = include __DIR__ . '/routes.php';
 $router = new Router($request, new RouteMatcher());
 
 // Add routes to the router
-foreach ($routes as $route) {
-    $router->addRoute($route['method'], $route['path'], $route['handler']);
+foreach ($routes as $group) {
+    if (!isset($group['routes']) || !is_array($group['routes'])) continue;
+    foreach ($group['routes'] as $route) {
+        if (
+            isset($route['method'], $route['path'], $route['handler'])
+        ) {
+            $router->addRoute($route['method'], $route['path'], $route['handler']);
+        }
+    }
 }
 
 // Dispatch the request
@@ -57,5 +65,16 @@ if (is_array($response)) {
 
 // Send the response
 http_response_code($response->getStatusCode());
-header('Content-Type: application/json');
+
+if (method_exists($response, 'getHeaders')) {
+    $headers = $response->getHeaders();
+    if (is_array($headers)) {
+        foreach ($headers as $name => $value) {
+            header("$name: $value");
+        }
+    } else {
+        header('Content-Type: application/json');
+    }
+}
+
 echo $response->getBody();

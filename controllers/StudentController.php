@@ -21,29 +21,33 @@ class StudentController {
 
     public function getStudentById($id) {
         $student = $this->studentRepository->getById($id);
-        
         if (empty($student)) {
             return $this->notFoundResponse();
         }
-        
-        return new Response(200, json_encode($student[0]));
+        return new Response(200, json_encode($student));
     }
 
-    public function createStudent() {
+    
+     public function createStudent() {
         $data = $this->request->getBody();
         $this->studentRepository->create($data);
-        return $this->createdResponse();
+        header('Location: /students');
+        exit;
     }
 
     public function updateStudent($id) {
         $data = $this->request->getBody();
+        unset($data['_method']); 
         $this->studentRepository->update($id, $data);
-        return $this->successResponse('Student updated');
+        header('Location: /students');
+        exit;
     }
 
     public function deleteStudent($id) {
+        // Now uses DBORM via repository
         $this->studentRepository->delete($id);
-        return new Response(204, '');
+        header('Location: /students');
+        exit;
     }
 
     private function notFoundResponse() {

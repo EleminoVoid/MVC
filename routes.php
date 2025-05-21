@@ -1,145 +1,186 @@
 <?php
 namespace mvc;
 
-global $request, $controller, $studentController, $userController, $authController, $authMiddleware, $adminMiddleware;
+global $viewController, $userController, $authController, $authMiddleware, $studentController;
 
 return [
-    // Public routes (no authentication required)
     'public' => [
         'routes' => [
+   
             [
-                'method' => 'POST',
-                'path' => '/register',
-                'handler' => function () use ($authController) {
-                    echo "Register route matched\n";
-                    return $authController->register();
+                'method' => 'GET',
+                'path' => '/login',
+                'handler' => function () use ($viewController) {
+                    return $viewController->showLoginForm();
                 }
             ],
             [
                 'method' => 'POST',
                 'path' => '/login',
                 'handler' => function () use ($authController) {
-                    echo "Login route matched\n";
                     return $authController->login();
+                }
+            ],
+            [
+                'method' => 'GET',
+                'path' => '/register',
+                'handler' => function () use ($viewController) {
+                    return $viewController->showRegisterForm();
+                }
+            ],
+            [
+                'method' => 'POST',
+                'path' => '/register',
+                'handler' => function () use ($authController) {
+                    return $authController->register();
                 }
             ]
         ]
     ],
 
-    // User routes (authentication required)
     'users' => [
         'middleware' => [$authMiddleware],
         'routes' => [
+            // HTML VIEW ROUTES (for browser)
             [
                 'method' => 'GET',
-                'path' => '/users',
-                'handler' => function () use ($userController, $adminMiddleware, $request) {
-                    echo "List users route matched\n";
-                    $adminCheck = $adminMiddleware->handle($request);
-                    if ($adminCheck) return $adminCheck;
-                    return $userController->getAllUsers();
+                'path' => '/home',
+                'handler' => function () {
+                    ob_start();
+                    include __DIR__ . '/views/homepage.php';
+                    $content = ob_get_clean();
+                    return new \mvc\responses\Response(200, $content, ['Content-Type' => 'text/html']);
                 }
             ],
-            
-            [
-                'method' => 'POST',
-                'path' => '/users',
-                'handler' => function () use ($userController) {
-                    echo "Create user route matched\n";
-                    return $userController->createUser();
-                }
-            ],
-            
             [
                 'method' => 'GET',
-                'path' => '/users/{id}',
-                'handler' => function ($id) use ($userController) {
-                    echo "Get user route matched\n";
-                    return $userController->getUserById($id);
+                'path' => '/userlist',
+                'handler' => function () {
+                    ob_start();
+                    include __DIR__ . '/views/userlist.php';
+                    $content = ob_get_clean();
+                    return new \mvc\responses\Response(200, $content, ['Content-Type' => 'text/html']);
                 }
             ],
-            
-            [
-                'method' => 'PUT',
-                'path' => '/users/{id}',
-                'handler' => function ($id) use ($userController) {
-                    echo "Update user route matched\n";
-                    return $userController->updateUser($id);
-                }
-            ],
-            
-            [
-                'method' => 'DELETE',
-                'path' => '/users/{id}',
-                'handler' => function ($id) use ($userController, $adminMiddleware, $request) {
-                    echo "Delete user route matched\n";
-                    $adminCheck = $adminMiddleware->handle($request);
-                    if ($adminCheck) return $adminCheck;
-                    return $userController->deleteUser($id);
-                }
-            ]
-        ]
-    ],
-
-    // Student CRUD routes (keeping your existing structure)
-    'students' => [
-        'middleware' => [$authMiddleware],
-        'routes' => [
             [
                 'method' => 'GET',
                 'path' => '/students',
+                'handler' => function () use ($viewController) {
+                    return $viewController->showStudentList();
+                }
+            ],
+            [
+                'method' => 'GET',
+                'path' => '/students/create',
+                'handler' => function () use ($viewController) {
+                    return $viewController->showCreateForm();
+                }
+            ],
+            [
+                'method' => 'GET',
+                'path' => '/students/{id}/edit',
+                'handler' => function ($id) use ($viewController) {
+                    return $viewController->showEditForm($id);
+                }
+            ],
+            [
+                'method' => 'POST',
+                'path' => '/students/{id}/edit',
+                'handler' => function ($id) use ($studentController) {
+                    return $studentController->updateStudent($id);
+                }
+            ],
+            [
+                'method' => 'POST',
+                'path' => '/students/{id}/delete',
+                'handler' => function ($id) use ($studentController) {
+                    return $studentController->deleteStudent($id);
+                }
+            ],
+
+            // API ROUTES (for JSON, all prefixed with /api/)
+            [
+                'method' => 'GET',
+                'path' => '/api/users',
+                'handler' => function () use ($userController) {
+                    return $userController->getAllUsers();
+                }
+            ],
+            [
+                'method' => 'POST',
+                'path' => '/api/users',
+                'handler' => function () use ($userController) {
+                    return $userController->createUser();
+                }
+            ],
+            [
+                'method' => 'GET',
+                'path' => '/api/users/{id}',
+                'handler' => function ($id) use ($userController) {
+                    return $userController->getUserById($id);
+                }
+            ],
+            [
+                'method' => 'PUT',
+                'path' => '/api/users/{id}',
+                'handler' => function ($id) use ($userController) {
+                    return $userController->updateUser($id);
+                }
+            ],
+            [
+                'method' => 'DELETE',
+                'path' => '/api/users/{id}',
+                'handler' => function ($id) use ($userController) {
+                    return $userController->deleteUser($id);
+                }
+            ],
+            [
+                'method' => 'GET',
+                'path' => '/api/students',
                 'handler' => function () use ($studentController) {
-                    echo "Students route matched\n";
                     return $studentController->getAllStudents();
                 }
             ],
             [
                 'method' => 'POST',
-                'path' => '/students',
+                'path' => '/api/students',
                 'handler' => function () use ($studentController) {
-                    echo "Create student route matched\n";
                     return $studentController->createStudent();
                 }
             ],
             [
                 'method' => 'GET',
-                'path' => '/students/{id}',
+                'path' => '/api/students/{id}',
                 'handler' => function ($id) use ($studentController) {
-                    echo "Get student by ID route matched\n";
                     return $studentController->getStudentById($id);
                 }
             ],
             [
                 'method' => 'PUT',
-                'path' => '/students/{id}',
+                'path' => '/api/students/{id}',
                 'handler' => function ($id) use ($studentController) {
-                    echo "Update student route matched\n";
                     return $studentController->updateStudent($id);
                 }
             ],
             [
                 'method' => 'DELETE',
-                'path' => '/students/{id}',
+                'path' => '/api/students/{id}',
                 'handler' => function ($id) use ($studentController) {
-                    echo "Delete student route matched\n";
                     return $studentController->deleteStudent($id);
                 }
-            ]
-        ]
-    ],
-
-    // Admin routes (authentication + admin required)
-    'admin' => [
-        'middleware' => [$authMiddleware, $adminMiddleware],
-        'routes' => [
+            ],
             [
                 'method' => 'GET',
-                'path' => '/admin/dashboard',
-                'handler' => function () use ($adminController) {
-                    return $adminController->dashboard();
+                'path' => '/logout',
+                'handler' => function () {
+                    setcookie('token', '', time() - 3600, '/');
+                    if (session_status() === PHP_SESSION_ACTIVE) {
+                        session_destroy();
+                    }
+                    header('Location: /login');
+                    exit;
                 }
-            ],
-            // ...other admin-only routes...
+            ]
         ]
     ]
 ];

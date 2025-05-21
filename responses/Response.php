@@ -5,10 +5,12 @@ namespace mvc\responses;
 class Response {
     private $statusCode;
     private $body;
+    private $headers;
 
-    public function __construct($statusCode, $body) {
+    public function __construct($statusCode, $body, $headers = []) {
         $this->statusCode = $statusCode;
         $this->body = $body;
+        $this->headers = $headers;
     }
 
     public function getStatusCode() {
@@ -17,5 +19,9 @@ class Response {
 
     public function getBody() {
         return $this->body;
+    }
+
+    public function getHeaders() {
+        return $this->headers;
     }
 }

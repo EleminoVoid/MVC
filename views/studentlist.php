@@ -11,21 +11,20 @@
         <h1>Students List</h1>
     </header>
     <main>
-        <ul>
-            <?php
-            // Sample student data (replace with actual data from the database)
-            $students = [
-                ['name' => 'Student 1', 'email' => 'student1@example.com'],
-                ['name' => 'Student 2', 'email' => 'student2@example.com'],
-                ['name' => 'Student 3', 'email' => 'student3@example.com'],
-            ];
-
-            foreach ($students as $student) {
-                echo "<li>{$student['name']} - {$student['email']}</li>";
-            }
-            ?>
+        <ul class="student-list">
+            <?php foreach ($students as $student): ?>
+                <li>
+                    <?= htmlspecialchars($student['name']) ?> - <?= htmlspecialchars($student['email']) ?>
+                    <div class="actions">
+                        <a href="/students/<?= $student['id'] ?>/edit" class="btn">Edit</a>
+                        <form action="/students/<?= $student['id'] ?>/delete" method="POST" class="inline" onsubmit="return confirm('Delete this student?')">
+                            <button type="submit" class="delete-btn">Delete</button>
+                        </form>
+                    </div>
+                </li>
+            <?php endforeach; ?>
         </ul>
-        <a href="create_student.php">Create New Student</a>
+        <a href="/students/create">Create New Student</a>
     </main>
 </body>
 </html>

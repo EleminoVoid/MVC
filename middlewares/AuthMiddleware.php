@@ -11,23 +11,16 @@ class AuthMiddleware {
     }
 
     public function handle($request) {
-        $headers = getallheaders();
-
-        if (!isset($headers['Authorization'])) {
-            return $this->unauthorizedResponse();
+        if (isset($_COOKIE['token'])) {
+            $token = $_COOKIE['token'];
+            $decoded = $this->authController->validateToken($token);
+            if (is_array($decoded) && isset($decoded['error'])) {
+                header('Location: /login');
+                exit;
+            }
+            return null;
         }
-
-        $token = str_replace('Bearer ', '', $headers['Authorization']);
-        $decoded = $this->authController->validateToken($token);
-
-        if (is_array($decoded) && isset($decoded['error'])) {
-            return $decoded; 
-        }
-
-        return null;
-    }
-
-    private function unauthorizedResponse() {
-        return ['status' => 401, 'error' => 'Unauthorized'];
+        header('Location: /login');
+        exit;
     }
 }

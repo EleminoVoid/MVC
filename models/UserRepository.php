@@ -2,62 +2,49 @@
 namespace mvc\models;
 
 use mvc\classes\DataRepositoryInterface;
+use mvc\models\DBORM;
 
 class UserRepository implements DataRepositoryInterface {
     private $db;
 
-    public function __construct(Database $db) {
+    public function __construct(DBORM $db) {
         $this->db = $db;
     }
 
     public function getAll() {
-        return $this->db->query("SELECT id, name, email FROM users");
+        return $this->db->table('users')->select(['id', 'name', 'email'])->get();
     }
 
     public function getById($id) {
-        return $this->db->query("SELECT * FROM users WHERE id = ?", [$id]);
+        return $this->db->table('users')->select()->where('id', $id)->first();
+    }
+
+    public function getByName($name) {
+        return $this->db->table('users')->select()->where('name', $name)->first();
+    }
+    
+    public function getByEmail($email) {
+        return $this->db->table('users')->select(['id', 'name', 'email', 'password'])->where('email', $email)->first();
     }
 
     public function create($data) {
-        $columns = implode(", ", array_keys($data));
-        $placeholders = implode(", ", array_fill(0, count($data), "?"));
-        $this->db->query(
-            "INSERT INTO users ($columns) VALUES ($placeholders)",
-            array_values($data)
-        );
+        return $this->db->table('users')->insert($data);
     }
 
     public function update($id, $data) {
-        $setClause = implode(", ", array_map(fn($key) => "$key = ?", array_keys($data)));
-        $this->db->query(
-            "UPDATE users SET $setClause WHERE id = ?",
-            [...array_values($data), $id]
-        );
+        return $this->db->table('users')->where('id', $id)->update($data);
     }
 
     public function delete($id) {
-        $this->db->query("DELETE FROM users WHERE id = ?", [$id]);
+        return $this->db->table('users')->where('id', $id)->delete();
     }
 
-    public function getByEmail($email) {
-        $query = "SELECT id, name, email, password FROM users WHERE email = ?";
-        $result = $this->db->query($query, [$email]);
-        return $result ? $result[0] : null;
+    public function countAll(): int {
+        $result = $this->db->table('users')->select(['COUNT(*) as count'])->get();
+        return isset($result[0]['count']) ? (int)$result[0]['count'] : 0;
     }
 
-    public function countAll(): int
-{
-    $stmt = $this->db->prepare("SELECT COUNT(*) FROM users");
-    $stmt->execute();
-    return (int)$stmt->fetchColumn();
-}
-
-public function getPaginated(int $offset, int $limit): array
-{
-    $stmt = $this->db->prepare("SELECT * FROM users LIMIT :limit OFFSET :offset");
-    $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-    $stmt->execute();
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
+    public function getPaginated(int $offset, int $limit): array {
+        return $this->db->table('users')->select()->limit($limit)->offset($offset)->get();
+    }
 }
