@@ -34,6 +34,10 @@ class Router {
             return call_user_func_array($match['handler'], array_values($match['params']));
         }
 
-        return new Response(404, json_encode(['error' => 'Not Found']));
+        // 404 logic
+        ob_start();
+        include __DIR__ . '/../views/404.php';
+        $content = ob_get_clean();
+        return new Response(404, $content, ['Content-Type' => 'text/html']);
     }
 }

@@ -10,15 +10,15 @@
     <header>
         <h1>Login</h1>
     </header>
-    <main>
-        <form action="auth_controller.php" method="POST">
+    <main class="login-register-main">
+        <form action="/api/login" method="POST">
             <label for="email">Email:</label>
             <input type="email" id="email" name="email" required>
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required>
             <button type="submit">Login</button>
         </form>
-        <p>Don't have an account? <a href="register.php">Register here</a></p>
+        <p>Don't have an account? <a href="/register">Register here</a></p>
     </main>
 </body>
 </html>

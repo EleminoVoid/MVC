@@ -10,22 +10,41 @@
     <header>
         <h1>Students List</h1>
     </header>
-    <main>
-        <ul>
-            <?php
-            // Sample student data (replace with actual data from the database)
-            $students = [
-                ['name' => 'Student 1', 'email' => 'student1@example.com'],
-                ['name' => 'Student 2', 'email' => 'student2@example.com'],
-                ['name' => 'Student 3', 'email' => 'student3@example.com'],
-            ];
-
-            foreach ($students as $student) {
-                echo "<li>{$student['name']} - {$student['email']}</li>";
-            }
-            ?>
-        </ul>
-        <a href="create_student.php">Create New Student</a>
+    <main id="student-list-main">
+        <button onclick="window.location.href='/home'">Go Back Home</button>
+        <div class="student-table-wrapper">
+            <ul class="student-table">
+                <li class="student-table-header">
+                    <span>Name</span>
+                    <span>Email</span>
+                    <span>Actions</span>
+                </li>
+                <?php if (!empty($students)): ?>
+                    <?php foreach ($students as $student): ?>
+                        <li class="student-table-row">
+                            <span><?= htmlspecialchars($student['name']) ?></span>
+                            <span><?= htmlspecialchars($student['email']) ?></span>
+                            <span>
+                                <a href="/students/<?= $student['id'] ?>/edit">Edit</a>
+                                <a href="/students/<?= $student['id'] ?>/delete" >Delete</a>
+                            </span>
+                        </li>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <li><span colspan="3">No students found.</span></li>
+                <?php endif; ?>
+            </ul>
+        </div>
+        <a href="/students/create">Create New Student</a>
+        <div class="pagination">
+            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                <?php if ($i == $page): ?>
+                    <strong><?= $i ?></strong>
+                <?php else: ?>
+                    <a href="/students?page=<?= $i ?>"><?= $i ?></a>
+                <?php endif; ?>
+            <?php endfor; ?>
+        </div>
     </main>
 </body>
 </html>

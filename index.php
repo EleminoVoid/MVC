@@ -3,7 +3,7 @@ namespace mvc;
 
 require_once 'init.php'; 
 
-use mvc\models\Database;
+use mvc\models\DBORM;
 use mvc\models\UserRepository;
 use mvc\models\StudentRepository;
 use mvc\requests\Request;
@@ -15,8 +15,9 @@ use mvc\middlewares\AuthMiddleware;
 use mvc\middlewares\RouteMatcher;
 
 // Database connection
-$db = new Database('localhost', 'root', 'root', 'UDB');
-
+$db = new DBORM('localhost', 'root', 'root', 'UDB');
+// $students = $db->table('students')->select()->get();
+// var_dump($students);
 // Repositories
 $userRepository = new UserRepository($db); 
 $studentRepository = new StudentRepository($db);
@@ -46,16 +47,4 @@ foreach ($routes as $route) {
 
 // Dispatch the request
 $response = $router->dispatch();
-
-// Handle array responses
-if (is_array($response)) {
-    http_response_code($response['status'] ?? 200);
-    header('Content-Type: application/json');
-    echo json_encode($response);
-    exit;
-}
-
-// Send the response
-http_response_code($response->getStatusCode());
-header('Content-Type: application/json');
-echo $response->getBody();
+$response->send();

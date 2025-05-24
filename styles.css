@@ -1,0 +1,403 @@
+/* Import a modern font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+html, body {
+    font-family: 'Inter', Arial, Helvetica, sans-serif;
+    color: #1a3d1a;
+    background: #f6fff6;
+    margin: 0;
+    padding: 0;
+}
+
+/* Homepage styles */
+#homepage-main {
+    background: linear-gradient(135deg, #e0ffe0 0%, #b2f7b2 100%);
+    min-height: 100vh;
+    padding: 2rem;
+}
+#homepage-main header h1 {
+    color: #218c21;
+}
+#homepage-main nav ul {
+    list-style: none;
+    padding: 0;
+}
+#homepage-main nav ul li a {
+    color: #218c21;
+    background: #d4ffd4;
+    padding: 0.5em 1em;
+    border-radius: 8px;
+    text-decoration: none;
+    margin-right: 1em;
+    transition: background 0.2s;
+}
+#homepage-main nav ul li a:hover {
+    background: #a8e6a8;
+}
+
+/* Login/Register styles */
+.login-register-main {
+    background: linear-gradient(135deg, #f0fff0 0%, #c8f7c8 100%);
+    min-height: 100vh;
+    padding: 2rem;
+}
+.login-register-main header h1 {
+    color: #218c21;
+}
+.login-register-main form {
+    background: #eaffea;
+    padding: 2em;
+    border-radius: 10px;
+    max-width: 350px;
+    margin: 2em auto;
+    box-shadow: 0 2px 8px #b2f7b2;
+}
+.login-register-main label {
+    display: block;
+    margin-top: 1em;
+    color: #218c21;
+}
+.login-register-main input[type="email"],
+.login-register-main input[type="password"],
+.login-register-main input[type="text"] {
+    width: 100%;
+    padding: 0.5em;
+    margin-top: 0.3em;
+    border: 1px solid #b2f7b2;
+    border-radius: 5px;
+}
+.login-register-main button {
+    background: #218c21;
+    color: #fff;
+    border: none;
+    padding: 0.7em 1.5em;
+    border-radius: 5px;
+    margin-top: 1em;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.login-register-main button:hover {
+    background: #43c943;
+}
+.login-register-main a {
+    color: #218c21;
+}
+
+/* Student List styles */
+#student-list-main {
+    background: linear-gradient(135deg, #eaffea 0%, #c8f7c8 100%);
+    min-height: 100vh;
+    padding: 2rem;
+}
+#student-list-main header h1 {
+    color: #218c21;
+}
+#student-list-main ul {
+    list-style: none;
+    padding: 0;
+}
+#student-list-main ul li {
+    background: #d4ffd4;
+    margin-bottom: 0.5em;
+    padding: 0.7em 1em;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+#student-list-main a {
+    color: #218c21;
+    margin-left: 1em;
+    text-decoration: none;
+    font-weight: bold;
+}
+#student-list-main a:hover {
+    text-decoration: underline;
+}
+#student-list-main button {
+    background: #218c21;
+    color: #fff;
+    border: none;
+    padding: 0.5em 1em;
+    border-radius: 5px;
+    margin-bottom: 1em;
+    cursor: pointer;
+}
+#student-list-main button:hover {
+    background: #43c943;
+}
+
+/* Student Create/Edit styles */
+.student-form-main {
+    background: linear-gradient(135deg, #f0fff0 0%, #d4ffd4 100%);
+    min-height: 100vh;
+    padding: 2rem;
+}
+.student-form-main h1 {
+    color: #218c21;
+}
+.student-form-main form {
+    background: #eaffea;
+    padding: 2em;
+    border-radius: 10px;
+    max-width: 350px;
+    margin: 2em auto;
+    box-shadow: 0 2px 8px #b2f7b2;
+}
+.student-form-main label {
+    display: block;
+    margin-top: 1em;
+    color: #218c21;
+}
+.student-form-main input[type="email"],
+.student-form-main input[type="text"] {
+    width: 100%;
+    padding: 0.5em;
+    margin-top: 0.3em;
+    border: 1px solid #b2f7b2;
+    border-radius: 5px;
+}
+.student-form-main button {
+    background: #218c21;
+    color: #fff;
+    border: none;
+    padding: 0.7em 1.5em;
+    border-radius: 5px;
+    margin-top: 1em;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.student-form-main button:hover {
+    background: #43c943;
+}
+.student-form-main a {
+    color: #218c21;
+}
+
+/* 404 Page styles */
+#notfound-main {
+    background: linear-gradient(135deg, #e0ffe0 0%, #b2f7b2 100%);
+    min-height: 100vh;
+    padding: 2rem;
+    text-align: center;
+}
+#notfound-main h1 {
+    color: #218c21;
+}
+#notfound-main p {
+    color: #43c943;
+}
+
+/* Enhanced Student List Table Styles */
+.student-table-wrapper {
+    margin: 2em auto;
+    max-width: 700px;
+    background: #eaffea;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px #b2f7b2;
+    padding: 2em 1em;
+}
+.student-table {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    min-width: 400px;
+}
+.student-table-header,
+.student-table-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1em 0.5em;
+}
+.student-table-header {
+    background: #b2f7b2;
+    font-weight: bold;
+    border-radius: 8px 8px 0 0;
+    color: #218c21;
+    font-size: 1.1em;
+    border-bottom: 2px solid #218c21;
+}
+.student-table-row {
+    background: #f6fff6;
+    border-bottom: 1px solid #b2f7b2;
+    transition: background 0.2s;
+}
+.student-table-row:hover {
+    background: #d4ffd4;
+}
+.student-table-row span {
+    flex: 1;
+    padding: 0 0.5em;
+}
+.student-table-row span:last-child {
+    text-align: right;
+}
+.student-table a {
+    margin-left: 0.5em;
+    color: #218c21;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.2s;
+}
+.student-table a:hover {
+    color: #43c943;
+    text-decoration: underline;
+}
+.student-table-header span {
+    flex: 1;
+    padding: 0 0.5em;
+}
+.student-table-header span:last-child {
+    text-align: right;
+}
+.student-table li:last-child {
+    border-radius: 0 0 8px 8px;
+}
+.studentlist-actions {
+    display: flex;
+    gap: 0.5em;
+    justify-content: flex-end;
+}
+.studentlist-create-btn {
+    display: inline-block;
+    margin: 1.5em 0 0 0;
+    background: #218c21;
+    color: #fff;
+    padding: 0.7em 1.5em;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+.studentlist-create-btn:hover {
+    background: #43c943;
+}
+.studentlist-header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5em;
+}
+.studentlist-header-bar h1 {
+    margin: 0;
+    color: #218c21;
+    font-size: 2em;
+    letter-spacing: 1px;
+}
+.studentlist-header-bar button {
+    background: #218c21;
+    color: #fff;
+    border: none;
+    padding: 0.5em 1.2em;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background 0.2s;
+}
+.studentlist-header-bar button:hover {
+    background: #43c943;
+}
+.delete-center-wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.delete-center-wrapper form, .delete-center-wrapper button {
+    margin: 0.5em;
+}
+.pagination {
+    margin-top: 2em;
+    text-align: center;
+}
+.pagination a, .pagination strong {
+    display: inline-block;
+    margin: 0 0.3em;
+    padding: 0.5em 1em;
+    border-radius: 4px;
+    background: #b2f7b2;
+    color: #218c21;
+    text-decoration: none;
+    font-weight: bold;
+}
+.pagination strong {
+    background: #218c21;
+    color: #fff;
+}
+.pagination a:hover {
+    background: #43c943;
+    color: #fff;
+}
+.delete-center-wrapper.delete-confirm-box {
+    background: #eaffea;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px #b2f7b2;
+    padding: 2.5em 2em 2em 2em;
+    max-width: 400px;
+    margin: 4em auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.delete-confirm-box h1 {
+    color: #218c21;
+    margin-bottom: 1em;
+}
+
+.delete-confirm-box p {
+    color: #1a3d1a;
+    margin-bottom: 2em;
+    font-size: 1.1em;
+}
+
+.delete-confirm-box .delete-form {
+    display: inline-block;
+    margin-bottom: 1em;
+}
+
+.delete-confirm-box .delete-btn {
+    background: #c94343;
+    color: #fff;
+    border: none;
+    outline: none;
+    padding: 0.7em 1.5em;
+    border-radius: 5px;
+    margin-right: 1em;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s, box-shadow 0.2s;
+    box-shadow: none;
+}
+
+.delete-confirm-box .delete-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #b2f7b2;
+}
+
+.delete-confirm-box button:not(.delete-btn) {
+    background: #218c21;
+    color: #fff;
+    border: none;
+    padding: 0.7em 1.5em;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+
+.delete-confirm-box button:not(.delete-btn):hover {
+    background: #43c943;
+}
+@media (max-width: 600px) {
+    .student-table-header, .student-table-row {
+        font-size: 0.95em;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .student-table-row span, .student-table-header span {
+        padding: 0.2em 0;
+    }
+}

@@ -10,8 +10,8 @@
     <header>
         <h1>Register</h1>
     </header>
-    <main>
-        <form action="auth_controller.php" method="POST">
+    <main class="login-register-main">
+        <form action="api/register" method="POST">
             <label for="name">Name:</label>
             <input type="text" id="name" name="name" required>
             <label for="email">Email:</label>
@@ -20,8 +20,7 @@
             <input type="password" id="password" name="password" required>
             <button type="submit">Register</button>
         </form>
-        <p>Already have an account? <a href="login.php">Login here</a></p>
+        <p>Already have an account? <a href="/login">Login here</a></p>
     </main>
 </body>
 </html>
-w

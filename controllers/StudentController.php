@@ -32,18 +32,35 @@ class StudentController {
     public function createStudent() {
         $data = $this->request->getBody();
         $this->studentRepository->create($data);
-        return $this->createdResponse();
+        $content = <<<HTML
+        <h2>Student Created</h2>
+        <p>The student was created successfully.</p>
+        <meta http-equiv="refresh" content="0.5;url=/students">
+    HTML;
+        return new Response(201, $content, ['Content-Type' => 'text/html']);
     }
 
     public function updateStudent($id) {
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
         $data = $this->request->getBody();
         $this->studentRepository->update($id, $data);
-        return $this->successResponse('Student updated');
+        $content = <<<HTML
+        <h2>Student Updated</h2>
+        <p>The student was updated successfully.</p>
+        <meta http-equiv="refresh" content="0.5;url=/students?page={$page}">
+    HTML;
+        return new Response(200, $content, ['Content-Type' => 'text/html']);
     }
 
     public function deleteStudent($id) {
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
         $this->studentRepository->delete($id);
-        return new Response(204, '');
+        $content = <<<HTML
+        <h2>Student Deleted</h2>
+        <p>The student was deleted successfully.</p>
+        <meta http-equiv="refresh" content="0.5;url=/students?page={$page}">
+    HTML;
+        return new Response(200, $content, ['Content-Type' => 'text/html']);
     }
 
     private function notFoundResponse() {

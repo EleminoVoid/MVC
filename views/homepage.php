@@ -10,12 +10,11 @@
     <header>
         <h1>Welcome to the MVC Application</h1>
     </header>
-    <main>
+    <main id="homepage-main">
         <p>This is the homepage of the MVC application. Navigate to the user or student sections to manage data.</p>
         <nav>
             <ul>
-                <li><a href="userlist.php">View Users</a></li>
-                <li><a href="studentlist.php">View Students</a></li>
+                <li><a href="/students">View Students</a></li>
             </ul>
         </nav>
     </main>

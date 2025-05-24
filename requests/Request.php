@@ -14,10 +14,16 @@ class Request implements RequestInterface {
     }
 
     public function getBody(): array {
-        $data = [];
-        if ($this->getMethod() === 'POST' || $this->getMethod() === 'PUT') {
+        if ($this->getMethod() === 'POST') {
+            if (!empty($_POST)) {
+                return $_POST;
+            }
             $data = json_decode(file_get_contents('php://input'), true);
+            if (is_array($data)) {
+                return $data;
+            }
+            return [];
         }
-        return $data;
+        return $_GET ?? [];
     }
 }

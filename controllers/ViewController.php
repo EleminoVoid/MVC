@@ -1,15 +1,63 @@
 <?php
+namespace mvc\controllers;
 
+use mvc\responses\Response;
 
-public static void RegisterRoutes(RouteCollection routes) {
-        routes.IgnoreRoute("{resource}.axd/{*pathInfo}");              
+class ViewController {
+    public function showHome() {
+        ob_start();
+        include __DIR__ . '/../views/homepage.php';
+        $content = ob_get_clean();
+        return new Response(200, $content, ['Content-Type' => 'text/html']);
+    }
 
-        routes.MapMvcAttributeRoutes();
+    public function showStudentList($studentRepository, $page = 1) {
+        $perPage = 6;
+        $offset = ($page - 1) * $perPage;
+        $students = $studentRepository->getPaginated($perPage, $offset);
+        $total = $studentRepository->countAll();
+        $totalPages = ceil($total / $perPage);
 
-        routes.MapRoute(
-         name: "Default",
-         url: "{controller}/{action}/{id}",
-         defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
-        );
+        ob_start();
+        include __DIR__ . '/../views/studentlist.php';
+        $content = ob_get_clean();
+        return new \mvc\responses\Response(200, $content, ['Content-Type' => 'text/html']);
+    }
+
+    public function showStudentEdit($id, $studentRepository) {
+        $student = $studentRepository->getById($id);
+        ob_start();
+        include __DIR__ . '/../views/student_edit.php';
+        $content = ob_get_clean();
+        return new Response(200, $content, ['Content-Type' => 'text/html']);
+    }
+
+    public function showStudentDelete($id, $studentRepository) {
+        $student = $studentRepository->getById($id);
+        ob_start();
+        include __DIR__ . '/../views/student_delete.php';
+        $content = ob_get_clean();
+        return new Response(200, $content, ['Content-Type' => 'text/html']);
+    }
+
+    public function showLogin() {
+        ob_start();
+        include __DIR__ . '/../views/login.php';
+        $content = ob_get_clean();
+        return new Response(200, $content, ['Content-Type' => 'text/html']);
+    }
+
+    public function showRegister() {
+        ob_start();
+        include __DIR__ . '/../views/register.php';
+        $content = ob_get_clean();
+        return new Response(200, $content, ['Content-Type' => 'text/html']);
+    }
+
+    public function showStudentCreate() {
+        ob_start();
+        include __DIR__ . '/../views/student_create.php';
+        $content = ob_get_clean();
+        return new \mvc\responses\Response(200, $content, ['Content-Type' => 'text/html']);
     }
 }

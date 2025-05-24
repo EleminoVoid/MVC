@@ -2,10 +2,10 @@
 namespace mvc\views;
 
 use mvc\models\UserRepository;
-use mvc\models\Database;
+use mvc\models\DBORM;
 
 // Initialize the database connection
-$db = new Database('localhost', 'root', 'root', 'UDB');
+$db = new DBORM('localhost', 'root', 'root', 'UDB');
 $userRepository = new UserRepository($db);
 
 // Fetch all users

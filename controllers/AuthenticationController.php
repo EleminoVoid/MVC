@@ -4,6 +4,7 @@ namespace mvc\controllers;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use mvc\models\UserRepository;
+use mvc\responses\Response;
 
 class AuthenticationController {
     private $userRepository;
@@ -14,23 +15,52 @@ class AuthenticationController {
 
     public function register() {
         $data = json_decode(file_get_contents('php://input'), true);
-        
-        if (isset($data['password'])) {
-            $data['password'] = password_hash($data['password'], PASSWORD_BCRYPT);
-        } else {
-            return ['status' => 400, 'error' => 'Password is required'];
+            if (!$data || !is_array($data)) {
+            $data = $_POST;
         }
 
+        if (empty($data['password'])) {
+            ob_start();
+            ?>
+            <h2>Registration Failed</h2>
+            <p>Password is required.</p>
+            <a href="/register">Back to Register</a>
+            <meta http-equiv="refresh" content="1;url=/register">
+            <?php
+            $content = ob_get_clean();
+            return new Response(400, $content, ['Content-Type' => 'text/html']);
+        }
+
+        $data['password'] = password_hash($data['password'], PASSWORD_BCRYPT);
         $this->userRepository->create($data);
-        
-        return ['status' => 201, 'message' => 'User  registered successfully'];
+
+        // HTML success for form with 1s redirect
+        ob_start();
+        ?>
+        <h2>Registration Successful</h2>
+        <p>You can now <a href="/login">login</a>.</p>
+        <meta http-equiv="refresh" content="1;url=/login">
+        <?php
+        $content = ob_get_clean();
+        return new Response(201, $content, ['Content-Type' => 'text/html']);
     }
 
     public function login() {
         $data = json_decode(file_get_contents('php://input'), true);
+        if (!$data || !is_array($data)) {
+            $data = $_POST;
+        }
 
         if (empty($data['email']) || empty($data['password'])) {
-            return ['status' => 400, 'error' => 'Email and password are required'];
+            ob_start();
+            ?>
+            <h2>Login Failed</h2>
+            <p>Email and password are required.</p>
+            <a href="/login">Back to Login</a>
+            <meta http-equiv="refresh" content="1;url=/login">
+            <?php
+            $content = ob_get_clean();
+            return new Response(400, $content, ['Content-Type' => 'text/html']);
         }
 
         $email = $data['email'];
@@ -39,28 +69,46 @@ class AuthenticationController {
         $user = $this->userRepository->getByEmail($email);
 
         if (!$user) {
-            error_log("User  not found for email: $email");
-            return ['status' => 401, 'error' => 'Invalid email'];
+            ob_start();
+            ?>
+            <h2>Login Failed</h2>
+            <p>Invalid email.</p>
+            <a href="/login">Back to Login</a>
+            <meta http-equiv="refresh" content="1;url=/login">
+            <?php
+            $content = ob_get_clean();
+            return new Response(401, $content, ['Content-Type' => 'text/html']);
         }
 
         if (!password_verify($password, $user['password'])) {
-            error_log("Password mismatch for email: $email");
-            return ['status' => 401, 'error' => 'Invalid password'];
+            ob_start();
+            ?>
+            <h2>Login Failed</h2>
+            <p>Invalid password.</p>
+            <a href="/login">Back to Login</a>
+            <meta http-equiv="refresh" content="1;url=/login">
+            <?php
+            $content = ob_get_clean();
+            return new Response(401, $content, ['Content-Type' => 'text/html']);
         }
 
-        $payload = [
-            'iss' => 'http://localhost',
-            'aud' => 'http://localhost',
-            'iat' => time(),
-            'exp' => time() + 3600, // 1hr
-            'userId' => $user['id'],
-            'email' => $user['email'],
-            'name' => $user['name']
-        ];
+        // Set session for authentication
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['user_name'] = $user['name'];
+        $_SESSION['user_email'] = $user['email'];
 
-        $jwt = JWT::encode($payload, 'your-secret-key', 'HS256');
-
-        return ['status' => 200, 'token' => $jwt];
+        // On success, show message and redirect to home after 1s
+        ob_start();
+        ?>
+        <h2>Login Successful</h2>
+        <p>Welcome back! Redirecting to homepage...</p>
+        <meta http-equiv="refresh" content="1;url=/home">
+        <?php
+        $content = ob_get_clean();
+        return new Response(200, $content, ['Content-Type' => 'text/html']);
     }
 
     public function validateToken($token) {
@@ -68,11 +116,22 @@ class AuthenticationController {
             $decoded = JWT::decode($token, new Key('your-secret-key', 'HS256'));
             return $decoded;
         } catch (\Firebase\JWT\ExpiredException $e) {
-            return ['status' => 401, 'error' => 'Token has expired'];
+            return new Response(401, json_encode(['error' => 'Token has expired']), ['Content-Type' => 'application/json']);
         } catch (\Firebase\JWT\SignatureInvalidException $e) {
-            return ['status' => 401, 'error' => 'Invalid token signature'];
+            return new Response(401, json_encode(['error' => 'Invalid token signature']), ['Content-Type' => 'application/json']);
         } catch (\Exception $e) {
-            return ['status' => 401, 'error' => 'Invalid token'];
+            return new Response(401, json_encode(['error' => 'Invalid token']), ['Content-Type' => 'application/json']);
         }
+    }
+
+    public function logout()
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        session_unset();
+        session_destroy();
+        header('Location: /login');
+        exit;
     }
 }
