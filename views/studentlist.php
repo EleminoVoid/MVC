@@ -37,13 +37,7 @@
         </div>
         <a href="/students/create">Create New Student</a>
         <div class="pagination">
-            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                <?php if ($i == $page): ?>
-                    <strong><?= $i ?></strong>
-                <?php else: ?>
-                    <a href="/students?page=<?= $i ?>"><?= $i ?></a>
-                <?php endif; ?>
-            <?php endfor; ?>
+            <?= $paginationLinks ?>
         </div>
     </main>
 </body>

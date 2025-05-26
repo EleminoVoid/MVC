@@ -106,5 +106,49 @@ return [
             return new Response(400, 'Invalid method');
         }
     ],
+    // List all students (GET /api/students)
+    [
+        'method' => 'GET',
+        'path' => '/api/students',
+        'handler' => function() use ($authMiddleware, $request, $studentController) {
+            $authMiddleware->handle($request);
+            return $studentController->getAllStudents();
+        }
+    ],
+    // Get a single student by ID (GET /api/students/{id})
+    [
+        'method' => 'GET',
+        'path' => '/api/students/{id}',
+        'handler' => function($id) use ($authMiddleware, $request, $studentController) {
+            $authMiddleware->handle($request);
+            return $studentController->getStudentById($id);
+        }
+    ],
+    // Create a student (POST /api/students)
+    [
+        'method' => 'POST',
+        'path' => '/api/students',
+        'handler' => function() use ($authMiddleware, $request, $studentController) {
+            $authMiddleware->handle($request);
+            return $studentController->createStudent();
+        }
+    ],
+    // Update a student (PUT /api/students/{id})
+    [
+        'method' => 'PUT',
+        'path' => '/api/students/{id}',
+        'handler' => function($id) use ($authMiddleware, $request, $studentController) {
+            $authMiddleware->handle($request);
+            return $studentController->updateStudent($id);
+        }
+    ],
+    [
+        'method' => 'DELETE',
+        'path' => '/api/students/{id}',
+        'handler' => function($id) use ($authMiddleware, $request, $studentController) {
+            $authMiddleware->handle($request);
+            return $studentController->deleteStudent($id);
+        }
+    ],
     // ... more API routes ...
 ];

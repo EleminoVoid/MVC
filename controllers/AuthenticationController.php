@@ -19,16 +19,29 @@ class AuthenticationController {
             $data = $_POST;
         }
 
-        if (empty($data['password'])) {
+        if (empty($data['email']) || empty($data['name']) || empty($data['password'])) {
             ob_start();
             ?>
             <h2>Registration Failed</h2>
-            <p>Password is required.</p>
+            <p>Email, name, and password are required.</p>
             <a href="/register">Back to Register</a>
             <meta http-equiv="refresh" content="1;url=/register">
             <?php
             $content = ob_get_clean();
             return new Response(400, $content, ['Content-Type' => 'text/html']);
+        }
+
+        // Check if email already exists
+        if ($this->userRepository->getByEmail($data['email'])) {
+            ob_start();
+            ?>
+            <h2>Registration Failed</h2>
+            <p>Email is already registered.</p>
+            <a href="/register">Back to Register</a>
+            <meta http-equiv="refresh" content="1;url=/register">
+            <?php
+            $content = ob_get_clean();
+            return new Response(409, $content, ['Content-Type' => 'text/html']);
         }
 
         $data['password'] = password_hash($data['password'], PASSWORD_BCRYPT);
@@ -47,11 +60,16 @@ class AuthenticationController {
 
     public function login() {
         $data = json_decode(file_get_contents('php://input'), true);
+        $isApi = is_array($data) && isset($_SERVER['CONTENT_TYPE']) && strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false;
+
         if (!$data || !is_array($data)) {
             $data = $_POST;
         }
 
         if (empty($data['email']) || empty($data['password'])) {
+            if ($isApi) {
+                return new Response(400, json_encode(['error' => 'Email and password are required']), ['Content-Type' => 'application/json']);
+            }
             ob_start();
             ?>
             <h2>Login Failed</h2>
@@ -65,14 +83,16 @@ class AuthenticationController {
 
         $email = $data['email'];
         $password = $data['password'];
-
         $user = $this->userRepository->getByEmail($email);
 
-        if (!$user) {
+        if (!$user || !password_verify($password, $user['password'])) {
+            if ($isApi) {
+                return new Response(401, json_encode(['error' => 'Invalid credentials']), ['Content-Type' => 'application/json']);
+            }
             ob_start();
             ?>
             <h2>Login Failed</h2>
-            <p>Invalid email.</p>
+            <p>Invalid email or password.</p>
             <a href="/login">Back to Login</a>
             <meta http-equiv="refresh" content="1;url=/login">
             <?php
@@ -80,19 +100,22 @@ class AuthenticationController {
             return new Response(401, $content, ['Content-Type' => 'text/html']);
         }
 
-        if (!password_verify($password, $user['password'])) {
-            ob_start();
-            ?>
-            <h2>Login Failed</h2>
-            <p>Invalid password.</p>
-            <a href="/login">Back to Login</a>
-            <meta http-equiv="refresh" content="1;url=/login">
-            <?php
-            $content = ob_get_clean();
-            return new Response(401, $content, ['Content-Type' => 'text/html']);
+        // JWT for API
+        if ($isApi) {
+            $payload = [
+                'iss' => 'http://localhost',
+                'aud' => 'http://localhost',
+                'iat' => time(),
+                'exp' => time() + 3600,
+                'userId' => $user['id'],
+                'email' => $user['email'],
+                'name' => $user['name']
+            ];
+            $jwt = JWT::encode($payload, 'your-secret-key', 'HS256');
+            return new Response(200, json_encode(['token' => $jwt]), ['Content-Type' => 'application/json']);
         }
 
-        // Set session for authentication
+        // Session for browser
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }

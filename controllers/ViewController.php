@@ -16,7 +16,16 @@ class ViewController {
         $offset = ($page - 1) * $perPage;
         $students = $studentRepository->getPaginated($perPage, $offset);
         $total = $studentRepository->countAll();
-        $totalPages = ceil($total / $perPage);
+        $totalPages = max(1, ceil($total / $perPage));
+
+        $paginationLinks = '';
+        for ($i = 1; $i <= $totalPages; $i++) {
+            if ($i == $page) {
+                $paginationLinks .= "<strong>{$i}</strong> ";
+            } else {
+                $paginationLinks .= "<a href=\"/students?page={$i}\">{$i}</a> ";
+            }
+        }
 
         ob_start();
         include __DIR__ . '/../views/studentlist.php';
