@@ -9,6 +9,10 @@
     </style>
 </head>
 <body class="student-form-main">
+    <header>
+        <h2>Delete Student</h2>
+        <a href="/logout" style="float:right; margin-top:-2.5em; margin-right:1em;" class="logout-btn">Logout</a>
+    </header>
     <div class="delete-center-wrapper delete-confirm-box">
         <h1>Delete Student</h1>
         <p>Are you sure you want to delete <strong><?= htmlspecialchars($student['name']) ?></strong>?</p>

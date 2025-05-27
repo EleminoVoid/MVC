@@ -50,6 +50,7 @@ class AuthenticationController {
         // HTML success for form with 1s redirect
         ob_start();
         ?>
+        <link rel="stylesheet" href="/styles.css">
         <h2>Registration Successful</h2>
         <p>You can now <a href="/login">login</a>.</p>
         <meta http-equiv="refresh" content="1;url=/login">
@@ -59,19 +60,34 @@ class AuthenticationController {
     }
 
     public function login() {
+        // Get request data
         $data = json_decode(file_get_contents('php://input'), true);
-        $isApi = is_array($data) && isset($_SERVER['CONTENT_TYPE']) && strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false;
+        
+        // Better API detection - check both Content-Type and Accept headers
+        $isApi = (
+            isset($_SERVER['CONTENT_TYPE']) && 
+            strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false
+        ) || (
+            isset($_SERVER['HTTP_ACCEPT']) && 
+            strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false
+        );
 
+        // For non-JSON requests, fallback to POST data
         if (!$data || !is_array($data)) {
             $data = $_POST;
         }
 
+        // Validate input
         if (empty($data['email']) || empty($data['password'])) {
             if ($isApi) {
-                return new Response(400, json_encode(['error' => 'Email and password are required']), ['Content-Type' => 'application/json']);
+                return new Response(400, json_encode([
+                    'status' => 'error',
+                    'message' => 'Email and password are required'
+                ]), ['Content-Type' => 'application/json']);
             }
             ob_start();
             ?>
+            <link rel="stylesheet" href="/styles.css">
             <h2>Login Failed</h2>
             <p>Email and password are required.</p>
             <a href="/login">Back to Login</a>
@@ -81,16 +97,19 @@ class AuthenticationController {
             return new Response(400, $content, ['Content-Type' => 'text/html']);
         }
 
-        $email = $data['email'];
-        $password = $data['password'];
-        $user = $this->userRepository->getByEmail($email);
-
-        if (!$user || !password_verify($password, $user['password'])) {
+        // Verify credentials
+        $user = $this->userRepository->getByEmail($data['email']);
+        
+        if (!$user || !password_verify($data['password'], $user['password'])) {
             if ($isApi) {
-                return new Response(401, json_encode(['error' => 'Invalid credentials']), ['Content-Type' => 'application/json']);
+                return new Response(401, json_encode([
+                    'status' => 'error',
+                    'message' => 'Invalid credentials'
+                ]), ['Content-Type' => 'application/json']);
             }
             ob_start();
             ?>
+            <link rel="stylesheet" href="/styles.css">
             <h2>Login Failed</h2>
             <p>Invalid email or password.</p>
             <a href="/login">Back to Login</a>
@@ -100,7 +119,7 @@ class AuthenticationController {
             return new Response(401, $content, ['Content-Type' => 'text/html']);
         }
 
-        // JWT for API
+        // Handle API login
         if ($isApi) {
             $payload = [
                 'iss' => 'http://localhost',
@@ -108,11 +127,18 @@ class AuthenticationController {
                 'iat' => time(),
                 'exp' => time() + 3600,
                 'userId' => $user['id'],
-                'email' => $user['email'],
-                'name' => $user['name']
+                'email' => $user['email']
             ];
             $jwt = JWT::encode($payload, 'your-secret-key', 'HS256');
-            return new Response(200, json_encode(['token' => $jwt]), ['Content-Type' => 'application/json']);
+            return new Response(200, json_encode([
+                'status' => 'success',
+                'token' => $jwt,
+                'user' => [
+                    'id' => $user['id'],
+                    'email' => $user['email'],
+                    'name' => $user['name']
+                ]
+            ]), ['Content-Type' => 'application/json']);
         }
 
         // Session for browser
@@ -126,6 +152,7 @@ class AuthenticationController {
         // On success, show message and redirect to home after 1s
         ob_start();
         ?>
+        <link rel="stylesheet" href="/styles.css">
         <h2>Login Successful</h2>
         <p>Welcome back! Redirecting to homepage...</p>
         <meta http-equiv="refresh" content="1;url=/home">

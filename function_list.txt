@@ -1,0 +1,101 @@
+# Function List for Key MVC Files
+
+## controllers/AuthenticationController.php
+- __construct(UserRepository $userRepository)
+- register()
+- login()
+- validateToken($token)
+- logout()
+
+## controllers/StudentController.php
+- __construct(DataRepositoryInterface $studentRepository, RequestInterface $request)
+- getAllStudents()
+- getStudentById($id)
+- createStudent()
+- updateStudent($id)
+- deleteStudent($id)
+- notFoundResponse()
+
+## controllers/UserController.php
+- __construct(DataRepositoryInterface $userRepository, RequestInterface $request)
+- getAllUsers()
+- getUserById($id)
+- createUser()
+- updateUser($id)
+- deleteUser($id)
+
+## controllers/ViewController.php
+- showHome()
+- showStudentList($studentRepository, $page = 1)
+- showStudentEdit($id, $studentRepository)
+- showStudentDelete($id, $studentRepository)
+- showLogin()
+- showRegister()
+- showStudentCreate()
+
+## middlewares/AuthMiddleware.php
+- __construct(AuthenticationController $authController)
+- handle($request)
+
+## middlewares/SessionAuthMiddleware.php
+- handle($request)
+
+## middlewares/RouteMatcher.php
+- match($routes, $requestMethod, $requestPath)
+
+## models/StudentRepository.php
+- __construct(DBORM $db)
+- getAll()
+- getById($id)
+- create($data)
+- update($id, $data)
+- delete($id)
+- getByEmail($email)
+- getByName($name)
+- getPaginated($limit, $offset)
+- countAll()
+
+## models/UserRepository.php
+- __construct(DBORM $db)
+- getAll()
+- getById($id)
+- create($data)
+- update($id, $data)
+- delete($id)
+- getByEmail($email)
+- getByName($name)
+
+## models/DBORM.php
+- __construct($host, $user, $password, $dbname)
+- select($fieldList = null)
+- table($table)
+- from($table)
+- join(string $table, string $condition)
+- leftJoin(string $table, string $condition)
+- limit(int $limit)
+- offset(int $offset)
+- groupBy(string $field)
+- get()
+- getAll()
+- where()
+- whereOr()
+- showQuery()
+- showValueBag()
+- insert(array $values)
+- update(array $values)
+- delete()
+- query(string $sql, array $params = [])
+- beginTransaction()
+- commit()
+- rollback()
+- selectRaw(string $raw)
+
+## requests/Request.php
+- getMethod(): string
+- getPath(): string
+- getBody(): array
+
+## requests/Router.php
+- __construct(RequestInterface $request, RouteMatcher $routeMatcher)
+- addRoute($method, $path, $handler)
+- dispatch()

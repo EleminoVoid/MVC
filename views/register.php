@@ -11,7 +11,7 @@
         <h1>Register</h1>
     </header>
     <main class="login-register-main">
-        <form action="api/register" method="POST">
+        <form action="/api/register" method="POST">
             <label for="name">Name:</label>
             <input type="text" id="name" name="name" required>
             <label for="email">Email:</label>

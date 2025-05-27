@@ -6,6 +6,10 @@
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body class="student-form-main">
+    <header>
+        <h2>Create Student</h2>
+        <a href="/logout" style="float:right; margin-top:-2.5em; margin-right:1em;" class="logout-btn">Logout</a>
+    </header>
     <h1>Create New Student</h1>
     <form action="/api/students" method="POST">
         <label for="name">Name:</label>

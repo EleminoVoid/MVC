@@ -1,0 +1,98 @@
+# Manual and Automated Test Cases for Key MVC Functions
+
+## AuthenticationController.php
+- register()
+  - Test registration with valid data (should succeed)
+  - Test registration with missing fields (should fail)
+  - Test registration with duplicate email (should fail)
+- login()
+  - Test login with valid credentials (should succeed, returns JWT for API, session for web)
+  - Test login with invalid credentials (should fail)
+  - Test login with missing fields (should fail)
+- validateToken($token)
+  - Test with valid JWT (should succeed)
+  - Test with expired/invalid JWT (should fail)
+- logout()
+  - Test logout (should destroy session and redirect)
+
+## StudentController.php
+- getAllStudents()
+  - Test API GET /api/students (should return JSON array)
+- getStudentById($id)
+  - Test API GET /api/students/{id} with valid/invalid ID
+- createStudent()
+  - Test API POST /api/students with valid/missing data
+- updateStudent($id)
+  - Test API PUT /api/students/{id} with valid/invalid data
+- deleteStudent($id)
+  - Test API DELETE /api/students/{id} with valid/invalid ID
+
+## UserController.php
+- getAllUsers()
+  - Test API GET /api/users (should return JSON array)
+- getUserById($id)
+  - Test API GET /api/users/{id} with valid/invalid ID
+- createUser()
+  - Test API POST /api/users with valid/missing data
+- updateUser($id)
+  - Test API PUT /api/users/{id} with valid/invalid data
+- deleteUser($id)
+  - Test API DELETE /api/users/{id} with valid/invalid ID
+
+## ViewController.php (Web)
+- showHome()
+  - Access /home as authenticated/unauthenticated user
+- showStudentList()
+  - Access /students as authenticated/unauthenticated user
+- showStudentEdit(), showStudentDelete(), showStudentCreate()
+  - Access /students/{id}/edit, /students/{id}/delete, /students/create as authenticated/unauthenticated user
+
+## AuthMiddleware.php
+- handle($request)
+  - API request with valid/invalid/missing JWT
+
+## SessionAuthMiddleware.php
+- handle($request)
+  - Web request with/without session
+
+## RouteMatcher.php
+- match($routes, $requestMethod, $requestPath)
+  - Test with various route patterns and HTTP methods
+
+## StudentRepository.php & UserRepository.php
+- getAll(), getById(), create(), update(), delete(), getByEmail(), getByName(), getPaginated(), countAll()
+  - Unit test each method with valid/invalid data
+
+## DBORM.php
+- All query builder methods
+  - Unit test select, insert, update, delete, join, limit, offset, groupBy, etc. with mock data
+
+## Request.php
+- getMethod(), getPath(), getBody()
+  - Test with GET, POST, and JSON requests
+
+## Router.php
+- addRoute(), dispatch()
+  - Test route registration and dispatching for valid/invalid routes
+
+---
+
+# Example Manual Test Steps
+- Register a new user via web and API
+- Login via web and API
+- Access protected routes with/without authentication
+- Create, edit, delete students via web and API
+- Test pagination on student list
+- Test error handling (404, validation, auth errors)
+
+# Example Automated Test (PHPUnit)
+- Write PHPUnit tests for each controller and repository method
+- Mock dependencies (DBORM, Request, etc.)
+- Assert expected outputs and side effects
+
+---
+
+**Note:**
+- For API tests, use tools like Postman or curl.
+- For web tests, use a browser or Selenium.
+- For unit tests, use PHPUnit and mock dependencies as needed.

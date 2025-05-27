@@ -4,6 +4,7 @@ namespace mvc;
 use mvc\controllers\ViewController;
 use mvc\controllers\AuthenticationController;
 use mvc\middlewares\SessionAuthMiddleware;
+use mvc\middlewares\AuthMiddleware;
 use mvc\models\StudentRepository;
 use mvc\responses\Response;
 
@@ -12,6 +13,7 @@ global $request, $controller, $studentController, $userController, $authControll
 $viewController = new ViewController();
 $authController = new AuthenticationController($userRepository);
 $authMiddleware = new SessionAuthMiddleware();
+$jwtMiddleware = new AuthMiddleware($authController);
 $studentRepository = new StudentRepository($db);
 return [
     // Public views
@@ -83,72 +85,61 @@ return [
             return $viewController->showStudentCreate();
         }
     ],
-    // API routes (all POST/PUT/DELETE)
-    [
-        'method' => 'POST',
-        'path' => '/api/students',
-        'handler' => function() use ($authMiddleware, $request, $studentController) {
-            $authMiddleware->handle($request);
-            return $studentController->createStudent();
-        }
-    ],
-    [
-        'method' => 'POST',
-        'path' => '/api/students/{id}',
-        'handler' => function($id) use ($authMiddleware, $request, $studentController) {
-            $authMiddleware->handle($request);
-            $method = $_POST['_method'] ?? '';
-            if ($method === 'PUT') {
-                return $studentController->updateStudent($id);
-            } elseif ($method === 'DELETE') {
-                return $studentController->deleteStudent($id);
-            }
-            return new Response(400, 'Invalid method');
-        }
-    ],
-    // List all students (GET /api/students)
+    // API routes
     [
         'method' => 'GET',
         'path' => '/api/students',
-        'handler' => function() use ($authMiddleware, $request, $studentController) {
-            $authMiddleware->handle($request);
+        'handler' => function() use ($jwtMiddleware, $request, $studentController) {
+            $middlewareResponse = $jwtMiddleware->handle($request);
+            if ($middlewareResponse instanceof Response) {
+                return $middlewareResponse;
+            }
             return $studentController->getAllStudents();
         }
     ],
-    // Get a single student by ID (GET /api/students/{id})
     [
         'method' => 'GET',
         'path' => '/api/students/{id}',
-        'handler' => function($id) use ($authMiddleware, $request, $studentController) {
-            $authMiddleware->handle($request);
+        'handler' => function($id) use ($jwtMiddleware, $request, $studentController) {
+            $middlewareResponse = $jwtMiddleware->handle($request);
+            if ($middlewareResponse instanceof Response) {
+                return $middlewareResponse;
+            }
             return $studentController->getStudentById($id);
         }
     ],
-    // Create a student (POST /api/students)
     [
         'method' => 'POST',
         'path' => '/api/students',
-        'handler' => function() use ($authMiddleware, $request, $studentController) {
-            $authMiddleware->handle($request);
+        'handler' => function() use ($jwtMiddleware, $request, $studentController) {
+            $middlewareResponse = $jwtMiddleware->handle($request);
+            if ($middlewareResponse instanceof Response) {
+                return $middlewareResponse;
+            }
             return $studentController->createStudent();
         }
     ],
-    // Update a student (PUT /api/students/{id})
     [
         'method' => 'PUT',
         'path' => '/api/students/{id}',
-        'handler' => function($id) use ($authMiddleware, $request, $studentController) {
-            $authMiddleware->handle($request);
+        'handler' => function($id) use ($jwtMiddleware, $request, $studentController) {
+            $middlewareResponse = $jwtMiddleware->handle($request);
+            if ($middlewareResponse instanceof Response) {
+                return $middlewareResponse;
+            }
             return $studentController->updateStudent($id);
         }
     ],
     [
         'method' => 'DELETE',
         'path' => '/api/students/{id}',
-        'handler' => function($id) use ($authMiddleware, $request, $studentController) {
-            $authMiddleware->handle($request);
+        'handler' => function($id) use ($jwtMiddleware, $request, $studentController) {
+            $middlewareResponse = $jwtMiddleware->handle($request);
+            if ($middlewareResponse instanceof Response) {
+                return $middlewareResponse;
+            }
             return $studentController->deleteStudent($id);
         }
-    ],
-    // ... more API routes ...
+    ]
+    // ...remaining routes...
 ];

@@ -1,0 +1,101 @@
+# Function Explanations for Key MVC Files
+
+## controllers/AuthenticationController.php
+- __construct(UserRepository $userRepository): Uses dependency injection to access user data in the database.
+- register(): Uses UserRepository for DB access, password_hash for security, and Response for output. Gets input (JSON or POST), validates, checks for duplicate email, hashes password, creates user, returns HTML (web) or JSON (API).
+- login(): Uses UserRepository, JWT (for API), PHP $_SESSION (for web), and Response. Gets input, validates, checks credentials, issues JWT for API or sets session for web, returns appropriate response.
+- validateToken($token): Uses JWT::decode, Key (JWT secret), and Response. Decodes and validates JWT, returns decoded data or error.
+- logout(): Uses PHP session_* functions. Destroys session, redirects to login.
+
+## controllers/StudentController.php
+- __construct(DataRepositoryInterface $studentRepository, RequestInterface $request): Uses StudentRepository and Request for data and input access.
+- getAllStudents(): Uses StudentRepository. Gets all students, returns as JSON.
+- getStudentById($id): Uses StudentRepository. Gets student by ID, returns as JSON or error.
+- createStudent(): Uses StudentRepository and Request. Gets input, validates, creates student, returns success/error.
+- updateStudent($id): Uses StudentRepository and Request. Gets input, validates, updates student, returns success/error.
+- deleteStudent($id): Uses StudentRepository. Deletes student by ID, returns success/error.
+- notFoundResponse(): Uses Response. Returns a JSON 404 error.
+
+## controllers/UserController.php
+- __construct(DataRepositoryInterface $userRepository, RequestInterface $request): Uses UserRepository and Request for data and input access.
+- getAllUsers(): Uses UserRepository. Gets all users, returns as JSON.
+- getUserById($id): Uses UserRepository. Gets user by ID, returns as JSON or error.
+- createUser(): Uses UserRepository, Request, password_hash, and Response. Gets input, hashes password, creates user, returns success/error.
+- updateUser($id): Uses UserRepository, Request, password_hash, and Response. Gets input, hashes password if present, updates user, returns success/error.
+- deleteUser($id): Uses UserRepository. Deletes user by ID, returns success/error.
+
+## controllers/ViewController.php
+- showHome(): Uses PHP include for views and Response. Renders homepage view.
+- showStudentList($studentRepository, $page = 1): Uses StudentRepository, PHP include, and Response. Renders paginated student list view for web.
+- showStudentEdit($id, $studentRepository): Uses StudentRepository, PHP include, and Response. Renders student edit form for a given ID.
+- showStudentDelete($id, $studentRepository): Uses StudentRepository, PHP include, and Response. Renders student delete confirmation view for a given ID.
+- showLogin(): Uses PHP include and Response. Renders login view.
+- showRegister(): Uses PHP include and Response. Renders registration view.
+- showStudentCreate(): Uses PHP include and Response. Renders student creation form view.
+
+## middlewares/AuthMiddleware.php
+- __construct(AuthenticationController $authController): Uses AuthenticationController for token validation.
+- handle($request): Uses getallheaders(), AuthenticationController::validateToken(), and Response. Checks for JWT in headers, validates, returns error or allows request.
+
+## middlewares/SessionAuthMiddleware.php
+- handle($request): Uses PHP $_SESSION. Checks for session user, redirects to login if not authenticated.
+
+## middlewares/RouteMatcher.php
+- match($routes, $requestMethod, $requestPath): Uses regex and route definitions. Matches incoming request to a route, extracts parameters.
+
+## models/StudentRepository.php
+- __construct(DBORM $db): Uses DBORM for database operations.
+- getAll(): Uses DBORM. Returns all students from the database.
+- getById($id): Uses DBORM. Returns a student by ID.
+- create($data): Uses DBORM. Inserts a new student record.
+- update($id, $data): Uses DBORM. Updates a student record by ID.
+- delete($id): Uses DBORM. Deletes a student record by ID.
+- getByEmail($email): Uses DBORM. Returns a student by email.
+- getByName($name): Uses DBORM. Returns a student by name.
+- getPaginated($limit, $offset): Uses DBORM. Returns a paginated list of students.
+- countAll(): Uses DBORM. Returns the total number of students.
+
+## models/UserRepository.php
+- __construct(DBORM $db): Uses DBORM for database operations.
+- getAll(): Uses DBORM. Returns all users from the database.
+- getById($id): Uses DBORM. Returns a user by ID.
+- create($data): Uses DBORM. Inserts a new user record.
+- update($id, $data): Uses DBORM. Updates a user record by ID.
+- delete($id): Uses DBORM. Deletes a user record by ID.
+- getByEmail($email): Uses DBORM. Returns a user by email.
+- getByName($name): Uses DBORM. Returns a user by name.
+
+## models/DBORM.php
+- __construct($host, $user, $password, $dbname): Uses PDO for database connection.
+- select($fieldList = null): Sets the fields to select in a query.
+- table($table): Sets the table for the query.
+- from($table): Alias for table().
+- join(string $table, string $condition): Adds an INNER JOIN to the query.
+- leftJoin(string $table, string $condition): Adds a LEFT JOIN to the query.
+- limit(int $limit): Sets a LIMIT for the query.
+- offset(int $offset): Sets an OFFSET for the query.
+- groupBy(string $field): Adds a GROUP BY clause.
+- get(): Executes the built query and returns results as an array.
+- getAll(): Returns all records from the current table.
+- where(): Adds a WHERE clause.
+- whereOr(): Adds an OR WHERE clause.
+- showQuery(): Returns the current SQL query as a string.
+- showValueBag(): Returns the current query parameters.
+- insert(array $values): Inserts a new record and returns the new ID.
+- update(array $values): Updates records and returns affected rows.
+- delete(): Deletes records and returns affected rows.
+- query(string $sql, array $params = []): Executes a raw SQL query.
+- beginTransaction(): Begins a DB transaction.
+- commit(): Commits a DB transaction.
+- rollback(): Rolls back a DB transaction.
+- selectRaw(string $raw): Adds a raw select clause.
+
+## requests/Request.php
+- getMethod(): string: Uses PHP $_SERVER. Returns the HTTP method of the request.
+- getPath(): string: Uses PHP $_SERVER. Returns the request path.
+- getBody(): array: Uses PHP superglobals and file_get_contents('php://input'). Returns the request body as an array (POST, JSON, or GET data).
+
+## requests/Router.php
+- __construct(RequestInterface $request, RouteMatcher $routeMatcher): Uses Request and RouteMatcher for routing.
+- addRoute($method, $path, $handler): Adds a route to the router.
+- dispatch(): Uses RouteMatcher and Response. Matches the request to a route and executes the handler, or returns a 404 response.
