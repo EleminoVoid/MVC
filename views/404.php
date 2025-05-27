@@ -1,9 +1,7 @@
 <?php
-// Use direct session check instead of SessionAuthService
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-$isAuth = isset($_SESSION['user_id']);
+use mvc\services\SessionAuthService;
+
+$isAuth = SessionAuthService::isAuthenticated();
 $redirectUrl = $isAuth ? '/home' : '/login';
 $msg = $isAuth
     ? "Page not found. Redirecting to homepage..."

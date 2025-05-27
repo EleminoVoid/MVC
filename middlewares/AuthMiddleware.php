@@ -2,7 +2,6 @@
 namespace mvc\middlewares;
 
 use mvc\controllers\AuthenticationController;
-use mvc\responses\Response;
 
 class AuthMiddleware {
     private $authController;
@@ -13,31 +12,22 @@ class AuthMiddleware {
 
     public function handle($request) {
         $headers = getallheaders();
-        
-        // Check if Authorization header exists
+
         if (!isset($headers['Authorization'])) {
-            return new Response(401, json_encode([
-                'status' => 'error',
-                'message' => 'No token provided'
-            ]), ['Content-Type' => 'application/json']);
+            return $this->unauthorizedResponse();
         }
 
-        // Extract token from Bearer header
-        $authHeader = $headers['Authorization'];
-        if (!preg_match('/Bearer\s+(.*)$/i', $authHeader, $matches)) {
-            return new Response(401, json_encode([
-                'status' => 'error',
-                'message' => 'Invalid token format'
-            ]), ['Content-Type' => 'application/json']);
-        }
+        $token = str_replace('Bearer ', '', $headers['Authorization']);
+        $decoded = $this->authController->validateToken($token);
 
-        $token = $matches[1];
-        $result = $this->authController->validateToken($token);
-
-        if ($result instanceof Response) {
-            return $result;
+        if (is_array($decoded) && isset($decoded['error'])) {
+            return $decoded; 
         }
 
         return null;
+    }
+
+    private function unauthorizedResponse() {
+        return ['status' => 401, 'error' => 'Unauthorized'];
     }
 }

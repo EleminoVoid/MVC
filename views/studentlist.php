@@ -9,7 +9,6 @@
 <body>
     <header>
         <h1>Students List</h1>
-        <a href="/logout" style="float:right; margin-top:-2.5em; margin-right:1em;" class="logout-btn">Logout</a>
     </header>
     <main id="student-list-main">
         <button onclick="window.location.href='/home'">Go Back Home</button>

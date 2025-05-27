@@ -5,18 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Homepage</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="icon" type="image/png" href="https://img.icons8.com/ios-filled/32/000000/graduation-cap.png">
 </head>
 <body>
     <header>
-        <h1>Welcome to Student Central</h1>
-        <a href="/logout" style="float:right; margin-top:-2.5em; margin-right:1em;" class="logout-btn">Logout</a>
+        <h1>Welcome to the MVC Application</h1>
     </header>
     <main id="homepage-main">
-        <p>Student Central is your one-stop portal for managing student records. Here, you can view, add, edit, and remove students with ease. Whether you're an administrator or a teacher, our intuitive interface helps you keep your student database organized and up to date.</p>
+        <p>This is the homepage of the MVC application. Navigate to the user or student sections to manage data.</p>
         <nav>
             <ul>
-                <li><a href="/students">Go to Student Directory</a></li>
+                <li><a href="/students">View Students</a></li>
             </ul>
         </nav>
     </main>

@@ -1,12 +1,10 @@
 <?php
 namespace mvc\middlewares;
+use mvc\services\SessionAuthService;
 
 class SessionAuthMiddleware {
     public function handle($request) {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-        if (!isset($_SESSION['user_id'])) {
+        if (!SessionAuthService::isAuthenticated()) {
             header('Location: /login');
             exit;
         }

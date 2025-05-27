@@ -11,13 +11,7 @@ class StudentRepository  implements DataRepositoryInterface  {
         return $this->db->table('students')->select()->get();
     }
     public function getById($id) {
-        $result = $this->db->table('students')
-            ->select()
-            ->where('id', $id)
-            ->first();
-        
-        error_log('Repository getById result: ' . print_r($result, true));
-        return $result;
+        return $this->db->table('students')->select()->where('id', $id)->first();
     }
     public function create($data) {
         return $this->db->table('students')->insert($data);

@@ -16,42 +16,21 @@ class StudentController {
 
     public function getAllStudents() {
         $students = $this->studentRepository->getAll();
-        return new Response(200, json_encode($students), ['Content-Type' => 'application/json']);
+        return new Response(200, json_encode($students));
     }
 
     public function getStudentById($id) {
         $student = $this->studentRepository->getById($id);
         
-        // Debug logging
-        error_log('Student data for ID ' . $id . ': ' . print_r($student, true));
-        
         if (empty($student)) {
-            error_log('Empty student result');
             return $this->notFoundResponse();
         }
         
-        // For direct array responses
-        if (is_array($student) && !isset($student[0]) && isset($student['id'])) {
-            return new Response(200, json_encode($student), ['Content-Type' => 'application/json']);
-        }
-        
-        // For results wrapped in a numeric array
-        if (isset($student[0])) {
-            return new Response(200, json_encode($student[0]), ['Content-Type' => 'application/json']);
-        }
-        
-        error_log('Student found but in unexpected format');
-        return $this->notFoundResponse();
+        return new Response(200, json_encode($student[0]));
     }
 
     public function createStudent() {
         $data = $this->request->getBody();
-        
-        // Validate input data
-        if (empty($data['name']) || empty($data['email'])) {
-            return new Response(400, json_encode(['error' => 'Name and email are required']), ['Content-Type' => 'application/json']);
-        }
-
         $this->studentRepository->create($data);
         $content = <<<HTML
         <h2>Student Created</h2>
@@ -62,33 +41,37 @@ class StudentController {
     }
 
     public function updateStudent($id) {
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
         $data = $this->request->getBody();
-        
-        // Validate input data
-        if (empty($data['name']) || empty($data['email'])) {
-            return new Response(400, json_encode(['error' => 'Name and email are required']), ['Content-Type' => 'application/json']);
-        }
-
         $this->studentRepository->update($id, $data);
         $content = <<<HTML
         <h2>Student Updated</h2>
         <p>The student was updated successfully.</p>
-        <meta http-equiv="refresh" content="0.5;url=/students">
+        <meta http-equiv="refresh" content="0.5;url=/students?page={$page}">
     HTML;
         return new Response(200, $content, ['Content-Type' => 'text/html']);
     }
 
     public function deleteStudent($id) {
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
         $this->studentRepository->delete($id);
         $content = <<<HTML
         <h2>Student Deleted</h2>
         <p>The student was deleted successfully.</p>
-        <meta http-equiv="refresh" content="0.5;url=/students">
+        <meta http-equiv="refresh" content="0.5;url=/students?page={$page}">
     HTML;
         return new Response(200, $content, ['Content-Type' => 'text/html']);
     }
 
     private function notFoundResponse() {
-        return new Response(404, json_encode(['error' => 'Student not found']), ['Content-Type' => 'application/json']);
+        return new Response(404, json_encode(['error' => 'Student not found']));
+    }
+
+    private function createdResponse() {
+        return new Response(201, json_encode(['message' => 'Student created']));
+    }
+
+    private function successResponse($message) {
+        return new Response(200, json_encode(['message' => $message]));
     }
 }
