@@ -13,157 +13,83 @@ class AuthenticationController {
         $this->userRepository = $userRepository;
     }
 
+    // POST /api/register
     public function register() {
         $data = json_decode(file_get_contents('php://input'), true);
-            if (!$data || !is_array($data)) {
-            $data = $_POST;
-        }
-
-        if (empty($data['email']) || empty($data['name']) || empty($data['password'])) {
-            ob_start();
-            ?>
-            <h2>Registration Failed</h2>
-            <p>Email, name, and password are required.</p>
-            <a href="/register">Back to Register</a>
-            <meta http-equiv="refresh" content="1;url=/register">
-            <?php
-            $content = ob_get_clean();
-            return new Response(400, $content, ['Content-Type' => 'text/html']);
-        }
-
-        // Check if email already exists
-        if ($this->userRepository->getByEmail($data['email'])) {
-            ob_start();
-            ?>
-            <h2>Registration Failed</h2>
-            <p>Email is already registered.</p>
-            <a href="/register">Back to Register</a>
-            <meta http-equiv="refresh" content="1;url=/register">
-            <?php
-            $content = ob_get_clean();
-            return new Response(409, $content, ['Content-Type' => 'text/html']);
-        }
-
-        $data['password'] = password_hash($data['password'], PASSWORD_BCRYPT);
-        $this->userRepository->create($data);
-
-        // HTML success for form with 1s redirect
-        ob_start();
-        ?>
-        <link rel="stylesheet" href="/styles.css">
-        <h2>Registration Successful</h2>
-        <p>You can now <a href="/login">login</a>.</p>
-        <meta http-equiv="refresh" content="1;url=/login">
-        <?php
-        $content = ob_get_clean();
-        return new Response(201, $content, ['Content-Type' => 'text/html']);
-    }
-
-    public function login() {
-        // Get request data
-        $data = json_decode(file_get_contents('php://input'), true);
-        
-        // Better API detection - check both Content-Type and Accept headers
-        $isApi = (
-            isset($_SERVER['CONTENT_TYPE']) && 
-            strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false
-        ) || (
-            isset($_SERVER['HTTP_ACCEPT']) && 
-            strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false
-        );
-
-        // For non-JSON requests, fallback to POST data
         if (!$data || !is_array($data)) {
             $data = $_POST;
         }
-
-        // Validate input
-        if (empty($data['email']) || empty($data['password'])) {
-            if ($isApi) {
-                return new Response(400, json_encode([
-                    'status' => 'error',
-                    'message' => 'Email and password are required'
-                ]), ['Content-Type' => 'application/json']);
-            }
-            ob_start();
-            ?>
-            <link rel="stylesheet" href="/styles.css">
-            <h2>Login Failed</h2>
-            <p>Email and password are required.</p>
-            <a href="/login">Back to Login</a>
-            <meta http-equiv="refresh" content="1;url=/login">
-            <?php
-            $content = ob_get_clean();
-            return new Response(400, $content, ['Content-Type' => 'text/html']);
+        if (empty($data['email']) || empty($data['name']) || empty($data['password'])) {
+            return new Response(400, json_encode(['error' => 'Email, name, and password are required']), ['Content-Type' => 'application/json']);
         }
-
-        // Verify credentials
-        $user = $this->userRepository->getByEmail($data['email']);
-        
-        if (!$user || !password_verify($data['password'], $user['password'])) {
-            if ($isApi) {
-                return new Response(401, json_encode([
-                    'status' => 'error',
-                    'message' => 'Invalid credentials'
-                ]), ['Content-Type' => 'application/json']);
-            }
-            ob_start();
-            ?>
-            <link rel="stylesheet" href="/styles.css">
-            <h2>Login Failed</h2>
-            <p>Invalid email or password.</p>
-            <a href="/login">Back to Login</a>
-            <meta http-equiv="refresh" content="1;url=/login">
-            <?php
-            $content = ob_get_clean();
-            return new Response(401, $content, ['Content-Type' => 'text/html']);
+        if ($this->userRepository->getByEmail($data['email'])) {
+            return new Response(409, json_encode(['error' => 'Email is already registered']), ['Content-Type' => 'application/json']);
         }
-
-        // Handle API login
-        if ($isApi) {
-            $payload = [
-                'iss' => 'http://localhost',
-                'aud' => 'http://localhost',
-                'iat' => time(),
-                'exp' => time() + 3600,
-                'userId' => $user['id'],
-                'email' => $user['email']
-            ];
-            $jwt = JWT::encode($payload, 'your-secret-key', 'HS256');
-            return new Response(200, json_encode([
-                'status' => 'success',
-                'token' => $jwt,
-                'user' => [
-                    'id' => $user['id'],
-                    'email' => $user['email'],
-                    'name' => $user['name']
-                ]
-            ]), ['Content-Type' => 'application/json']);
-        }
-
-        // Session for browser
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['user_name'] = $user['name'];
-        $_SESSION['user_email'] = $user['email'];
-
-        // On success, show message and redirect to home after 1s
-        ob_start();
-        ?>
-        <link rel="stylesheet" href="/styles.css">
-        <h2>Login Successful</h2>
-        <p>Welcome back! Redirecting to homepage...</p>
-        <meta http-equiv="refresh" content="1;url=/home">
-        <?php
-        $content = ob_get_clean();
-        return new Response(200, $content, ['Content-Type' => 'text/html']);
+        $data['password'] = password_hash($data['password'], PASSWORD_BCRYPT);
+        $this->userRepository->create($data);
+        return new Response(201, json_encode(['message' => 'Registration successful']), ['Content-Type' => 'application/json']);
     }
 
+    // POST /api/login
+    public function login() {
+        $data = json_decode(file_get_contents('php://input'), true);
+        $isApi = false;
+        // Detect API request by Content-Type or Accept header
+        if ((isset($_SERVER['CONTENT_TYPE']) && strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false) ||
+            (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false)) {
+            $isApi = true;
+        }
+        if (!$data || !is_array($data)) {
+            $data = $_POST;
+        }
+        if (empty($data['email']) || empty($data['password'])) {
+            if ($isApi) {
+                return new Response(400, json_encode(['error' => 'Email and password required']), ['Content-Type' => 'application/json']);
+            } else {
+                ob_start();
+                echo '<link rel="stylesheet" href="/styles.css">';
+                echo '<h2>Login Failed</h2><p>Email and password required.</p>';
+                $content = ob_get_clean();
+                return new Response(400, $content, ['Content-Type' => 'text/html']);
+            }
+        }
+        $user = $this->userRepository->getByEmail($data['email']);
+        if (!$user || !password_verify($data['password'], $user['password'])) {
+            if ($isApi) {
+                return new Response(401, json_encode(['error' => 'Invalid credentials']), ['Content-Type' => 'application/json']);
+            } else {
+                ob_start();
+                echo '<link rel="stylesheet" href="/styles.css">';
+                echo '<h2>Login Failed</h2><p>Invalid credentials.</p>';
+                $content = ob_get_clean();
+                return new Response(401, $content, ['Content-Type' => 'text/html']);
+            }
+        }
+        $payload = [
+            'sub' => $user['id'],
+            'email' => $user['email'],
+            'iat' => time(),
+            'exp' => time() + 3600
+        ];
+        $secret = $_ENV['JWT_SECRET'] ?? 'secret';
+        $jwt = JWT::encode($payload, $secret, 'HS256');
+        setcookie('jwt_token', $jwt, time() + 3600, '/', '', false, true); // HttpOnly cookie
+        if ($isApi) {
+            return new Response(200, json_encode(['token' => $jwt]), ['Content-Type' => 'application/json']);
+        } else {
+            // Session login for web
+            if (session_status() === PHP_SESSION_NONE) session_start();
+            $_SESSION['user_id'] = $user['id'];
+            header('Location: /home');
+            exit;
+        }
+    }
+
+    // JWT validation for middleware
     public function validateToken($token) {
+        $secret = $_ENV['JWT_SECRET'] ?? 'secret';
         try {
-            $decoded = JWT::decode($token, new Key('your-secret-key', 'HS256'));
+            $decoded = JWT::decode($token, new Key($secret, 'HS256'));
             return $decoded;
         } catch (\Firebase\JWT\ExpiredException $e) {
             return new Response(401, json_encode(['error' => 'Token has expired']), ['Content-Type' => 'application/json']);
@@ -174,14 +100,19 @@ class AuthenticationController {
         }
     }
 
-    public function logout()
-    {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
+    // GET /logout
+    public function logout() {
+        $isApi = method_exists($this, 'isApiRequest') ? $this->isApiRequest() : (isset($_SERVER['CONTENT_TYPE']) && strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false);
+        if (session_status() === PHP_SESSION_NONE) session_start();
         session_unset();
         session_destroy();
-        header('Location: /login');
-        exit;
+        // Remove JWT cookie if set
+        setcookie('jwt', '', time() - 3600, '/');
+        if ($isApi) {
+            return new Response(200, json_encode(['message' => 'Logged out']), ['Content-Type' => 'application/json']);
+        } else {
+            header('Location: /login');
+            exit;
+        }
     }
 }

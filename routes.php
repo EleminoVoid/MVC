@@ -12,11 +12,11 @@ global $request, $controller, $studentController, $userController, $authControll
 
 $viewController = new ViewController();
 $authController = new AuthenticationController($userRepository);
-$authMiddleware = new SessionAuthMiddleware();
 $jwtMiddleware = new AuthMiddleware($authController);
 $studentRepository = new StudentRepository($db);
+$sessionAuth = new SessionAuthMiddleware();
 return [
-    // Public views
+    // Web views (session auth)
     [
         'method' => 'GET',
         'path' => '/login',
@@ -27,7 +27,48 @@ return [
         'path' => '/register',
         'handler' => fn() => $viewController->showRegister()
     ],
-    // Auth actions (API only)
+    [
+        'method' => 'GET',
+        'path' => '/home',
+        'handler' => function() use ($sessionAuth, $request, $viewController) {
+            $sessionAuth->handle($request);
+            return $viewController->showHome();
+        }
+    ],
+    [
+        'method' => 'GET',
+        'path' => '/students',
+        'handler' => function() use ($sessionAuth, $request, $viewController, $studentRepository) {
+            $sessionAuth->handle($request);
+            $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+            return $viewController->showStudentList($studentRepository, $page);
+        }
+    ],
+    [
+        'method' => 'GET',
+        'path' => '/students/create',
+        'handler' => function() use ($sessionAuth, $request, $viewController) {
+            $sessionAuth->handle($request);
+            return $viewController->showStudentCreate();
+        }
+    ],
+    [
+        'method' => 'GET',
+        'path' => '/students/{id}/edit',
+        'handler' => function($id) use ($sessionAuth, $request, $viewController, $studentRepository) {
+            $sessionAuth->handle($request);
+            return $viewController->showStudentEdit($id, $studentRepository);
+        }
+    ],
+    [
+        'method' => 'GET',
+        'path' => '/students/{id}/delete',
+        'handler' => function($id) use ($sessionAuth, $request, $viewController, $studentRepository) {
+            $sessionAuth->handle($request);
+            return $viewController->showStudentDelete($id, $studentRepository);
+        }
+    ],
+    // API Auth
     [
         'method' => 'POST',
         'path' => '/api/login',
@@ -43,57 +84,13 @@ return [
         'path' => '/logout',
         'handler' => fn() => $authController->logout()
     ],
-    // Private views (protected by middleware)
-    [
-        'method' => 'GET',
-        'path' => '/home',
-        'handler' => function() use ($authMiddleware, $request, $viewController) {
-            $authMiddleware->handle($request);
-            return $viewController->showHome();
-        }
-    ],
-    [
-        'method' => 'GET',
-        'path' => '/students',
-        'handler' => function() use ($authMiddleware, $request, $viewController, $studentRepository) {
-            $authMiddleware->handle($request);
-            $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
-            return $viewController->showStudentList($studentRepository, $page);
-        }
-    ],
-    [
-        'method' => 'GET',
-        'path' => '/students/{id}/edit',
-        'handler' => function($id) use ($authMiddleware, $request, $viewController, $studentRepository) {
-            $authMiddleware->handle($request);
-            return $viewController->showStudentEdit($id, $studentRepository);
-        }
-    ],
-    [
-        'method' => 'GET',
-        'path' => '/students/{id}/delete',
-        'handler' => function($id) use ($authMiddleware, $request, $viewController, $studentRepository) {
-            $authMiddleware->handle($request);
-            return $viewController->showStudentDelete($id, $studentRepository);
-        }
-    ],
-    [
-        'method' => 'GET',
-        'path' => '/students/create',
-        'handler' => function() use ($authMiddleware, $request, $viewController) {
-            $authMiddleware->handle($request);
-            return $viewController->showStudentCreate();
-        }
-    ],
-    // API routes
+    // API Students CRUD (JWT protected)
     [
         'method' => 'GET',
         'path' => '/api/students',
         'handler' => function() use ($jwtMiddleware, $request, $studentController) {
             $middlewareResponse = $jwtMiddleware->handle($request);
-            if ($middlewareResponse instanceof Response) {
-                return $middlewareResponse;
-            }
+            if ($middlewareResponse instanceof Response) return $middlewareResponse;
             return $studentController->getAllStudents();
         }
     ],
@@ -102,9 +99,7 @@ return [
         'path' => '/api/students/{id}',
         'handler' => function($id) use ($jwtMiddleware, $request, $studentController) {
             $middlewareResponse = $jwtMiddleware->handle($request);
-            if ($middlewareResponse instanceof Response) {
-                return $middlewareResponse;
-            }
+            if ($middlewareResponse instanceof Response) return $middlewareResponse;
             return $studentController->getStudentById($id);
         }
     ],
@@ -113,9 +108,7 @@ return [
         'path' => '/api/students',
         'handler' => function() use ($jwtMiddleware, $request, $studentController) {
             $middlewareResponse = $jwtMiddleware->handle($request);
-            if ($middlewareResponse instanceof Response) {
-                return $middlewareResponse;
-            }
+            if ($middlewareResponse instanceof Response) return $middlewareResponse;
             return $studentController->createStudent();
         }
     ],
@@ -124,9 +117,7 @@ return [
         'path' => '/api/students/{id}',
         'handler' => function($id) use ($jwtMiddleware, $request, $studentController) {
             $middlewareResponse = $jwtMiddleware->handle($request);
-            if ($middlewareResponse instanceof Response) {
-                return $middlewareResponse;
-            }
+            if ($middlewareResponse instanceof Response) return $middlewareResponse;
             return $studentController->updateStudent($id);
         }
     ],
@@ -135,11 +126,17 @@ return [
         'path' => '/api/students/{id}',
         'handler' => function($id) use ($jwtMiddleware, $request, $studentController) {
             $middlewareResponse = $jwtMiddleware->handle($request);
-            if ($middlewareResponse instanceof Response) {
-                return $middlewareResponse;
-            }
+            if ($middlewareResponse instanceof Response) return $middlewareResponse;
             return $studentController->deleteStudent($id);
         }
-    ]
-    // ...remaining routes...
+    ],
+    [
+        'method' => 'POST',
+        'path' => '/students/{id}/edit',
+        'handler' => function($id) use ($jwtMiddleware, $sessionAuth, $request, $studentController) {
+            $middlewareResponse = $jwtMiddleware->handle($request);
+            if ($middlewareResponse instanceof Response) return $middlewareResponse;
+            return $studentController->updateStudent($id);
+        }
+    ],
 ];

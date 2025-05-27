@@ -14,81 +14,115 @@ class StudentController {
         $this->request = $request;
     }
 
+    // GET /api/students
     public function getAllStudents() {
         $students = $this->studentRepository->getAll();
         return new Response(200, json_encode($students), ['Content-Type' => 'application/json']);
     }
 
+    // GET /api/students/{id}
     public function getStudentById($id) {
         $student = $this->studentRepository->getById($id);
-        
-        // Debug logging
-        error_log('Student data for ID ' . $id . ': ' . print_r($student, true));
-        
-        if (empty($student)) {
-            error_log('Empty student result');
-            return $this->notFoundResponse();
+        if (!$student) {
+            return new Response(404, json_encode(['error' => 'Student not found']), ['Content-Type' => 'application/json']);
         }
-        
-        // For direct array responses
-        if (is_array($student) && !isset($student[0]) && isset($student['id'])) {
-            return new Response(200, json_encode($student), ['Content-Type' => 'application/json']);
-        }
-        
-        // For results wrapped in a numeric array
-        if (isset($student[0])) {
-            return new Response(200, json_encode($student[0]), ['Content-Type' => 'application/json']);
-        }
-        
-        error_log('Student found but in unexpected format');
-        return $this->notFoundResponse();
+        return new Response(200, json_encode($student), ['Content-Type' => 'application/json']);
     }
 
+    // Helper to detect API request
+    private function isApiRequest() {
+        $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+        $accept = $_SERVER['HTTP_ACCEPT'] ?? '';
+        return (strpos($contentType, 'application/json') !== false) || (strpos($accept, 'application/json') !== false);
+    }
+
+    // Helper to set flash error and redirect
+    private function flashErrorAndRedirect($message, $redirectUrl) {
+        if (session_status() === PHP_SESSION_NONE) session_start();
+        $_SESSION['flash_error'] = $message;
+        header('Location: ' . $redirectUrl);
+        exit;
+    }
+
+    // Helper to get redirect URL with page param
+    private function getRedirectUrlWithPage($default = '/students') {
+        $page = null;
+        if (isset($_GET['page'])) {
+            $page = (int)$_GET['page'];
+        } elseif (isset($_POST['page'])) {
+            $page = (int)$_POST['page'];
+        }
+        return $page ? $default . '?page=' . $page : $default;
+    }
+
+    // POST /api/students or /students (web)
     public function createStudent() {
         $data = $this->request->getBody();
-        
-        // Validate input data
+        $isApi = $this->isApiRequest();
+        $redirectUrl = $this->getRedirectUrlWithPage();
         if (empty($data['name']) || empty($data['email'])) {
-            return new Response(400, json_encode(['error' => 'Name and email are required']), ['Content-Type' => 'application/json']);
+            if ($isApi) {
+                return new Response(400, json_encode(['error' => 'Name and email are required']), ['Content-Type' => 'application/json']);
+            } else {
+                $this->flashErrorAndRedirect('Name and email are required.', '/students/create');
+            }
         }
-
         $this->studentRepository->create($data);
-        $content = <<<HTML
-        <h2>Student Created</h2>
-        <p>The student was created successfully.</p>
-        <meta http-equiv="refresh" content="0.5;url=/students">
-    HTML;
-        return new Response(201, $content, ['Content-Type' => 'text/html']);
+        if ($isApi) {
+            return new Response(201, json_encode(['message' => 'Student created']), ['Content-Type' => 'application/json']);
+        } else {
+            header('Location: ' . $redirectUrl);
+            exit;
+        }
     }
 
+    // PUT /api/students/{id} or /students/{id}/edit (web)
     public function updateStudent($id) {
         $data = $this->request->getBody();
-        
-        // Validate input data
+        $isApi = $this->isApiRequest();
+        $redirectUrl = $this->getRedirectUrlWithPage();
         if (empty($data['name']) || empty($data['email'])) {
-            return new Response(400, json_encode(['error' => 'Name and email are required']), ['Content-Type' => 'application/json']);
+            if ($isApi) {
+                return new Response(400, json_encode(['error' => 'Name and email are required']), ['Content-Type' => 'application/json']);
+            } else {
+                $this->flashErrorAndRedirect('Name and email are required.', '/students/' . $id . '/edit');
+            }
         }
-
-        $this->studentRepository->update($id, $data);
-        $content = <<<HTML
-        <h2>Student Updated</h2>
-        <p>The student was updated successfully.</p>
-        <meta http-equiv="refresh" content="0.5;url=/students">
-    HTML;
-        return new Response(200, $content, ['Content-Type' => 'text/html']);
+        // Check if student exists first
+        $student = $this->studentRepository->getById($id);
+        if (!$student) {
+            if ($isApi) {
+                return new Response(404, json_encode(['error' => 'Student not found']), ['Content-Type' => 'application/json']);
+            } else {
+                $this->flashErrorAndRedirect('Student not found.', $redirectUrl);
+            }
+        }
+        $result = $this->studentRepository->update($id, $data);
+        if ($isApi) {
+            return new Response(200, json_encode(['message' => 'Student updated']), ['Content-Type' => 'application/json']);
+        } else {
+            header('Location: ' . $redirectUrl);
+            exit;
+        }
     }
 
+    // DELETE /api/students/{id}
     public function deleteStudent($id) {
-        $this->studentRepository->delete($id);
-        $content = <<<HTML
-        <h2>Student Deleted</h2>
-        <p>The student was deleted successfully.</p>
-        <meta http-equiv="refresh" content="0.5;url=/students">
-    HTML;
-        return new Response(200, $content, ['Content-Type' => 'text/html']);
-    }
-
-    private function notFoundResponse() {
-        return new Response(404, json_encode(['error' => 'Student not found']), ['Content-Type' => 'application/json']);
+        $isApi = $this->isApiRequest();
+        $redirectUrl = $this->getRedirectUrlWithPage();
+        $result = $this->studentRepository->delete($id);
+        if ($result === 0) {
+            if ($isApi) {
+                return new Response(404, json_encode(['error' => 'Student not found']), ['Content-Type' => 'application/json']);
+            } else {
+                $this->flashErrorAndRedirect('Student not found.', $redirectUrl);
+            }
+        }
+        if ($isApi) {
+            return new Response(200, json_encode(['message' => 'Student deleted']), ['Content-Type' => 'application/json']);
+        } else {
+            header('Location: ' . $redirectUrl);
+            exit;
+        }
     }
 }

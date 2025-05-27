@@ -23,7 +23,9 @@ class StudentRepository  implements DataRepositoryInterface  {
         return $this->db->table('students')->insert($data);
     }
     public function update($id, $data) {
-        return $this->db->table('students')->where('id', $id)->update($data);
+        $result = $this->db->table('students')->where('id', $id)->update($data);
+        error_log('StudentRepository->update: id=' . $id . ', data=' . print_r($data, true) . ', result=' . print_r($result, true));
+        return $result;
     }
     public function delete($id) {
         return $this->db->table('students')->where('id', $id)->delete();
