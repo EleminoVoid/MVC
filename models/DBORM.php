@@ -252,17 +252,20 @@ public function __construct($host, $user, $password, $dbname) {
         $valueBagTemp = [];
 
         foreach ($values as $key => $value) {
+            if ($key === '_method') {
+                continue; 
+            }
             $setStatements[] = "{$key} = ?";
             $valueBagTemp[] = $value;
         }
 
         $this->sql .= implode(', ', $setStatements);
         $this->sql .= $where;
+
         $this->valueBag = array_merge($valueBagTemp, $this->valueBag);
 
         return $this->_executeQuery();
     }
-
     public function delete(): int
     {
         $where = trim($this->sql);
