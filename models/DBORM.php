@@ -325,4 +325,23 @@ public function __construct($host, $user, $password, $dbname) {
         $this->sql = "SELECT $raw FROM {$this->table}";
         return $this;
     }
+
+    public function count(): int
+{
+    $this->sql = "SELECT COUNT(*) as count FROM {$this->table}";
+    $dbStatement = $this->db->prepare($this->sql);
+    
+    if ($this->valueBag) {
+        $dbStatement->execute($this->valueBag);
+    } else {
+        $dbStatement->execute();
+    }
+    
+    $result = $dbStatement->fetch(PDO::FETCH_ASSOC);
+    $this->whereInstanceCounter = 0;
+    $this->sql = '';
+    $this->valueBag = [];
+    
+    return (int)($result['count'] ?? 0);
+}
 }

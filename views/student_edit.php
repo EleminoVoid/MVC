@@ -11,13 +11,13 @@
         <a href="/logout" style="float:right; margin-top:-2.5em; margin-right:1em;" class="logout-btn">Logout</a>
     </header>
     <h1>Edit Student</h1>
-    <?php if (session_status() === PHP_SESSION_NONE) session_start(); ?>
     <?php if (!empty($_SESSION['flash_error'])): ?>
         <div class="error-message"><?php echo htmlspecialchars($_SESSION['flash_error']); ?></div>
         <?php unset($_SESSION['flash_error']); ?>
     <?php endif; ?>
-    <form action="/students/<?= $student['id'] ?>/edit" method="POST">
+    <form action="/api/students/<?= $student['id'] ?>" method="POST">
         <input type="hidden" name="_method" value="PUT">
+        <input type="hidden" name="id" value="<?= htmlspecialchars($student['id']) ?>" required>
         <label for="name">Name:</label>
         <input type="text" id="name" name="name" value="<?= htmlspecialchars($student['name']) ?>" required>
         <label for="email">Email:</label>

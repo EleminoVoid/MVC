@@ -48,3 +48,5 @@ foreach ($routes as $route) {
 // Dispatch the request
 $response = $router->dispatch();
 $response->send();
+?>
+

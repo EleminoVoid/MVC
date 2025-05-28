@@ -28,4 +28,8 @@ class UserRepository implements DataRepositoryInterface {
     public function getByName($name) {
         return $this->db->table('users')->select()->where('name', $name)->first();
     }
+    public function countAll() {
+        $result = $this->db->table('users')->selectRaw('COUNT(*) as cnt')->first();
+        return isset($result['cnt']) ? (int)$result['cnt'] : 0;
+    }
 }

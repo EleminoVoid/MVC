@@ -45,8 +45,8 @@ class StudentRepository  implements DataRepositoryInterface  {
             ->get();
     }
 
-    public function countAll() {
-        $result = $this->db->table('students')->selectRaw('COUNT(*) as cnt')->first();
-        return isset($result['cnt']) ? (int)$result['cnt'] : 0;
+    public function countAll(): int
+    {
+        return $this->db->table('students')->count();
     }
 }
