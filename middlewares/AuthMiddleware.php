@@ -32,6 +32,8 @@ class AuthMiddleware {
                 'error' => 'No token provided'
             ]), ['Content-Type' => 'application/json']);
         }
+        error_log("Authorization header: " . ($headers['Authorization'] ?? 'none'));
+        error_log("Token: " . $token);
         $result = $this->authController->validateToken($token);
         if ($result instanceof Response) {
             return $result;

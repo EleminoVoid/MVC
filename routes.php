@@ -46,7 +46,8 @@ return [
         'method' => 'GET',
         'path' => '/home',
         'handler' => function() use ($authMiddleware, $request, $viewController) {
-            $authMiddleware->handle($request);
+            $authResult = $authMiddleware->handle($request);
+            if ($authResult instanceof Response) return $authResult;
             return $viewController->showHome();
         }
     ],
@@ -54,7 +55,8 @@ return [
         'method' => 'GET',
         'path' => '/students',
         'handler' => function() use ($authMiddleware, $request, $viewController, $studentRepository) {
-            $authMiddleware->handle($request);
+            $authResult = $authMiddleware->handle($request);
+            if ($authResult instanceof Response) return $authResult;
             $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
             return $viewController->showStudentList($studentRepository, $page);
         }
@@ -63,7 +65,8 @@ return [
         'method' => 'GET',
         'path' => '/students/{id}/edit',
         'handler' => function($id) use ($authMiddleware, $request, $viewController, $studentRepository) {
-            $authMiddleware->handle($request);
+            $authResult = $authMiddleware->handle($request);
+            if ($authResult instanceof Response) return $authResult;
             return $viewController->showStudentEdit($id, $studentRepository);
         }
     ],
@@ -71,7 +74,8 @@ return [
         'method' => 'GET',
         'path' => '/students/{id}/delete',
         'handler' => function($id) use ($authMiddleware, $request, $viewController, $studentRepository) {
-            $authMiddleware->handle($request);
+            $authResult = $authMiddleware->handle($request);
+            if ($authResult instanceof Response) return $authResult;
             return $viewController->showStudentDelete($id, $studentRepository);
         }
     ],
@@ -79,7 +83,8 @@ return [
         'method' => 'GET',
         'path' => '/students/create',
         'handler' => function() use ($authMiddleware, $request, $viewController) {
-            $authMiddleware->handle($request);
+            $authResult = $authMiddleware->handle($request);
+            if ($authResult instanceof Response) return $authResult;
             return $viewController->showStudentCreate();
         }
     ],
@@ -88,7 +93,8 @@ return [
         'method' => 'POST',
         'path' => '/api/students',
         'handler' => function() use ($authMiddleware, $request, $studentController) {
-            $authMiddleware->handle($request);
+            $authResult = $authMiddleware->handle($request);
+            if ($authResult instanceof Response) return $authResult;
             return $studentController->createStudent();
         }
     ],
@@ -96,7 +102,8 @@ return [
         'method' => 'POST',
         'path' => '/api/students/{id}',
         'handler' => function($id) use ($authMiddleware, $request, $studentController) {
-            $authMiddleware->handle($request);
+            $authResult = $authMiddleware->handle($request);
+            if ($authResult instanceof Response) return $authResult;
             $method = $_POST['_method'] ?? '';
             if ($method === 'PUT') {
                 return $studentController->updateStudent($id);
@@ -106,39 +113,39 @@ return [
             return new Response(400, 'Invalid method');
         }
     ],
-    // List all students (GET /api/students)
     [
         'method' => 'GET',
         'path' => '/api/students',
         'handler' => function() use ($authMiddleware, $request, $studentController) {
-            $authMiddleware->handle($request);
+            $authResult = $authMiddleware->handle($request);
+            if ($authResult instanceof Response) return $authResult;
             return $studentController->getAllStudents();
         }
     ],
-    // Get a single student by ID (GET /api/students/{id})
     [
         'method' => 'GET',
         'path' => '/api/students/{id}',
         'handler' => function($id) use ($authMiddleware, $request, $studentController) {
-            $authMiddleware->handle($request);
+            $authResult = $authMiddleware->handle($request);
+            if ($authResult instanceof Response) return $authResult;
             return $studentController->getStudentById($id);
         }
     ],
-    // Create a student (POST /api/students)
     [
         'method' => 'POST',
         'path' => '/api/students',
         'handler' => function() use ($authMiddleware, $request, $studentController) {
-            $authMiddleware->handle($request);
+            $authResult = $authMiddleware->handle($request);
+            if ($authResult instanceof Response) return $authResult;
             return $studentController->createStudent();
         }
     ],
-    // Update a student (PUT /api/students/{id})
     [
         'method' => 'PUT',
         'path' => '/api/students/{id}',
         'handler' => function($id) use ($authMiddleware, $request, $studentController) {
-            $authMiddleware->handle($request);
+            $authResult = $authMiddleware->handle($request);
+            if ($authResult instanceof Response) return $authResult;
             return $studentController->updateStudent($id);
         }
     ],
@@ -146,7 +153,8 @@ return [
         'method' => 'DELETE',
         'path' => '/api/students/{id}',
         'handler' => function($id) use ($authMiddleware, $request, $studentController) {
-            $authMiddleware->handle($request);
+            $authResult = $authMiddleware->handle($request);
+            if ($authResult instanceof Response) return $authResult;
             return $studentController->deleteStudent($id);
         }
     ],
