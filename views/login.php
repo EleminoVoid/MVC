@@ -13,9 +13,9 @@
     <main class="login-register-main">
         <form action="/api/login" method="POST">
             <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
+            <input type="email" id="email" name="email" >
             <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
+            <input type="password" id="password" name="password" >
             <button type="submit">Login</button>
         </form>
         <p>Don't have an account? <a href="/register">Register here</a></p>
