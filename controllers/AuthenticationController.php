@@ -16,18 +16,47 @@ class AuthenticationController {
     // POST /api/register
     public function register() {
         $data = json_decode(file_get_contents('php://input'), true);
+        $isApi = false;
+        if ((isset($_SERVER['CONTENT_TYPE']) && strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false) ||
+            (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false)) {
+            $isApi = true;
+        }
         if (!$data || !is_array($data)) {
             $data = $_POST;
         }
         if (empty($data['email']) || empty($data['name']) || empty($data['password'])) {
-            return new Response(400, json_encode(['error' => 'Email, name, and password are required']), ['Content-Type' => 'application/json']);
+            if ($isApi) {
+                return new Response(400, json_encode(['error' => 'Email, name, and password are required']), ['Content-Type' => 'application/json']);
+            } else {
+                ob_start();
+                echo '<link rel="stylesheet" href="/styles.css">';
+                echo '<h2>Registration Failed</h2><p>Email, name, and password are required.</p>';
+                $content = ob_get_clean();
+                return new Response(400, $content, ['Content-Type' => 'text/html']);
+            }
         }
         if ($this->userRepository->getByEmail($data['email'])) {
-            return new Response(409, json_encode(['error' => 'Email is already registered']), ['Content-Type' => 'application/json']);
+            if ($isApi) {
+                return new Response(409, json_encode(['error' => 'Email is already registered']), ['Content-Type' => 'application/json']);
+            } else {
+                ob_start();
+                echo '<link rel="stylesheet" href="/styles.css">';
+                echo '<h2>Registration Failed</h2><p>Email is already registered.</p>';
+                $content = ob_get_clean();
+                return new Response(409, $content, ['Content-Type' => 'text/html']);
+            }
         }
         $data['password'] = password_hash($data['password'], PASSWORD_BCRYPT);
         $this->userRepository->create($data);
-        return new Response(201, json_encode(['message' => 'Registration successful']), ['Content-Type' => 'application/json']);
+        if ($isApi) {
+            return new Response(201, json_encode(['message' => 'Registration successful']), ['Content-Type' => 'application/json']);
+        } else {
+            ob_start();
+            echo '<link rel="stylesheet" href="/styles.css">';
+            echo '<h2>Registration Successful</h2><p>You can now <a href="/login">login</a>.</p>';
+            $content = ob_get_clean();
+            return new Response(201, $content, ['Content-Type' => 'text/html']);
+        }
     }
 
     // POST /api/login
@@ -102,12 +131,12 @@ class AuthenticationController {
 
     // GET /logout
     public function logout() {
-        $isApi = method_exists($this, 'isApiRequest') ? $this->isApiRequest() : (isset($_SERVER['CONTENT_TYPE']) && strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false);
+        $isApi = (isset($_SERVER['CONTENT_TYPE']) && strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false);
         if (session_status() === PHP_SESSION_NONE) session_start();
         session_unset();
         session_destroy();
         // Remove JWT cookie if set
-        setcookie('jwt', '', time() - 3600, '/');
+        setcookie('jwt_token', '', time() - 3600, '/');
         if ($isApi) {
             return new Response(200, json_encode(['message' => 'Logged out']), ['Content-Type' => 'application/json']);
         } else {
