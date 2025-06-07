@@ -31,6 +31,7 @@ class AuthenticationController {
                 ob_start();
                 echo '<link rel="stylesheet" href="/styles.css">';
                 echo '<h2>Registration Failed</h2><p>Email, name, and password are required.</p>';
+                echo '<script>setTimeout(function() { window.location.href = "/register"; }, 1000);</script>';
                 $content = ob_get_clean();
                 return new Response(400, $content, ['Content-Type' => 'text/html']);
             }
@@ -42,6 +43,7 @@ class AuthenticationController {
                 ob_start();
                 echo '<link rel="stylesheet" href="/styles.css">';
                 echo '<h2>Registration Failed</h2><p>Email is already registered.</p>';
+                echo '<script>setTimeout(function() { window.location.href = "/register"; }, 1000);</script>';
                 $content = ob_get_clean();
                 return new Response(409, $content, ['Content-Type' => 'text/html']);
             }
@@ -53,7 +55,8 @@ class AuthenticationController {
         } else {
             ob_start();
             echo '<link rel="stylesheet" href="/styles.css">';
-            echo '<h2>Registration Successful</h2><p>You can now <a href="/login">login</a>.</p>';
+            echo '<h2>Registration Successful</h2><p>You will be redirected to login page.</p>';
+            echo '<script>setTimeout(function() { window.location.href = "/login"; }, 1000);</script>';
             $content = ob_get_clean();
             return new Response(201, $content, ['Content-Type' => 'text/html']);
         }
@@ -78,6 +81,7 @@ class AuthenticationController {
                 ob_start();
                 echo '<link rel="stylesheet" href="/styles.css">';
                 echo '<h2>Login Failed</h2><p>Email and password required.</p>';
+                echo '<script>setTimeout(function() { window.location.href = "/login"; }, 1000);</script>';
                 $content = ob_get_clean();
                 return new Response(400, $content, ['Content-Type' => 'text/html']);
             }
@@ -90,6 +94,7 @@ class AuthenticationController {
                 ob_start();
                 echo '<link rel="stylesheet" href="/styles.css">';
                 echo '<h2>Login Failed</h2><p>Invalid credentials.</p>';
+                echo '<script>setTimeout(function() { window.location.href = "/login"; }, 1000);</script>';
                 $content = ob_get_clean();
                 return new Response(401, $content, ['Content-Type' => 'text/html']);
             }
@@ -102,15 +107,19 @@ class AuthenticationController {
         ];
         $secret = $_ENV['JWT_SECRET'] ?? 'secret';
         $jwt = JWT::encode($payload, $secret, 'HS256');
-        setcookie('jwt_token', $jwt, time() + 3600, '/', '', false, true); // HttpOnly cookie
+        setcookie('jwt_token', $jwt, time() + 3600, '/', '', false, true); 
         if ($isApi) {
             return new Response(200, json_encode(['token' => $jwt]), ['Content-Type' => 'application/json']);
         } else {
             // Session login for web
             if (session_status() === PHP_SESSION_NONE) session_start();
             $_SESSION['user_id'] = $user['id'];
-            header('Location: /home');
-            exit;
+            ob_start();
+            echo '<link rel="stylesheet" href="/styles.css">';
+            echo '<h2>Login Successful</h2><p>You will be redirected to home page.</p>';
+            echo '<script>setTimeout(function() { window.location.href = "/home"; }, 1000);</script>';
+            $content = ob_get_clean();
+            return new Response(200, $content, ['Content-Type' => 'text/html']);
         }
     }
 
@@ -140,8 +149,12 @@ class AuthenticationController {
         if ($isApi) {
             return new Response(200, json_encode(['message' => 'Logged out']), ['Content-Type' => 'application/json']);
         } else {
-            header('Location: /login');
-            exit;
+            ob_start();
+            echo '<link rel="stylesheet" href="/styles.css">';
+            echo '<h2>Logged Out</h2><p>You will be redirected to login page.</p>';
+            echo '<script>setTimeout(function() { window.location.href = "/login"; }, 1000);</script>';
+            $content = ob_get_clean();
+            return new Response(200, $content, ['Content-Type' => 'text/html']);
         }
     }
-}
+}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
