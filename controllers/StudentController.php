@@ -76,7 +76,7 @@ class StudentController {
         }
     }
 
-    // PUT /api/students/{id} or /students/{id}/edit (web)
+    // PUT /api/students/{id} 
     public function updateStudent($id) {
     $data = $this->request->getBody();
     $isApi = $this->isApiRequest();

@@ -73,6 +73,7 @@ return [
             return $viewController->showStudentEdit($id, $studentRepository);
         }
     ],
+    
     [
         'method' => 'GET',
         'path' => '/students/{id}/delete',
@@ -99,6 +100,31 @@ return [
             $authResult = $authMiddleware->handle($request);
             if ($authResult instanceof Response) return $authResult;
             return $studentController->getAllStudents();
+        }
+    ],
+    // Add these routes to your routes.php
+    [
+        'method' => 'POST',
+        'path' => '/students/{id}',
+        'handler' => function($id) use ($sessionAuthMiddleware, $request, $studentController) {
+            $authResult = $sessionAuthMiddleware->handle($request);
+            if ($authResult instanceof Response) return $authResult;
+            
+            // Handle method override
+            $data = $request->getBody();
+            if (isset($data['_method'])) {
+                $method = strtoupper($data['_method']);
+                unset($data['_method']);
+                
+                if ($method === 'PUT') {
+                    return $studentController->updateStudent($id);
+                } elseif ($method === 'DELETE') {
+                    return $studentController->deleteStudent($id);
+                }
+            }
+            
+            // Default to POST handling if needed
+            return new Response(400, 'Invalid request');
         }
     ],
     [
@@ -136,5 +162,5 @@ return [
             if ($authResult instanceof Response) return $authResult;
             return $studentController->deleteStudent($id);
         }
-    ],
+    ]
 ];

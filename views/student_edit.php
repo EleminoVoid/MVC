@@ -15,8 +15,9 @@
         <div class="error-message"><?php echo htmlspecialchars($_SESSION['flash_error']); ?></div>
         <?php unset($_SESSION['flash_error']); ?>
     <?php endif; ?>
-    <form action="/api/students/<?= $student['id'] ?>" method="POST">
+    <form action="/students/<?= $student['id'] ?>" method="POST">
         <input type="hidden" name="_method" value="PUT">
+        <input type="hidden" name="page" value="<?= isset($_GET['page']) ? (int)$_GET['page'] : 1 ?>">
         <input type="hidden" name="id" value="<?= htmlspecialchars($student['id']) ?>" required>
         <label for="name">Name:</label>
         <input type="text" id="name" name="name" value="<?= htmlspecialchars($student['name']) ?>" required>
