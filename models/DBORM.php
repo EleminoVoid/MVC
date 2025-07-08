@@ -242,8 +242,9 @@ public function __construct($host, $user, $password, $dbname) {
         }
     }
 
-    public function update(array $values): int
+     public function update(array $values): int
     {
+        // var_dump($values);
         $where = $this->sql;
         $this->sql = '';
         $this->sql = "UPDATE {$this->table} SET ";
@@ -260,6 +261,7 @@ public function __construct($host, $user, $password, $dbname) {
         }
 
         $this->sql .= implode(', ', $setStatements);
+        // var_dump($this->sql);
         $this->sql .= $where;
 
         $this->valueBag = array_merge($valueBagTemp, $this->valueBag);

@@ -102,7 +102,7 @@ return [
             return $studentController->getAllStudents();
         }
     ],
-    // Add these routes to your routes.php
+    // Postman calls breaks if we don't handle PUT, DELETE separately
     [
         'method' => 'POST',
         'path' => '/students/{id}',

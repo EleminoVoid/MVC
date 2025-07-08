@@ -11,18 +11,13 @@
         <a href="/logout" style="float:right; margin-top:-2.5em; margin-right:1em;" class="logout-btn">Logout</a>
     </header>
     <h1>Edit Student</h1>
-    <?php if (!empty($_SESSION['flash_error'])): ?>
-        <div class="error-message"><?php echo htmlspecialchars($_SESSION['flash_error']); ?></div>
-        <?php unset($_SESSION['flash_error']); ?>
-    <?php endif; ?>
     <form action="/students/<?= $student['id'] ?>" method="POST">
         <input type="hidden" name="_method" value="PUT">
-        <input type="hidden" name="page" value="<?= isset($_GET['page']) ? (int)$_GET['page'] : 1 ?>">
-        <input type="hidden" name="id" value="<?= htmlspecialchars($student['id']) ?>" required>
+        <input type="hidden" name="id" value="<?= $student['id'] ?>">
         <label for="name">Name:</label>
-        <input type="text" id="name" name="name" value="<?= htmlspecialchars($student['name']) ?>" required>
+        <input type="text" id="name" name="name" value="<?= htmlspecialchars($student['name']) ?>" >
         <label for="email">Email:</label>
-        <input type="email" id="email" name="email" value="<?= htmlspecialchars($student['email']) ?>" required>
+        <input type="email" id="email" name="email" value="<?= htmlspecialchars($student['email']) ?>" >
         <button type="submit">Save</button>
     </form>
     <a href="/students">Back to list</a>

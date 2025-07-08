@@ -84,7 +84,7 @@ class StudentController {
     
     if (empty($data['name']) || empty($data['email'])) {
         if ($isApi) {
-            return new Response(400, json_encode(['error' => 'Name and email are required']), ['Content-Type' => 'application/json']);
+            return new Response(400,    json_encode(['error' => 'Name and email are required']), ['Content-Type' => 'application/json']);
         } else {
             $this->flashErrorAndRedirect('Name and email are required.', '/students/' . $id . '/edit');
         }
